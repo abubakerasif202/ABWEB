@@ -16,7 +16,6 @@ import { StackLedger } from "./components/StackLedger";
 import { EnquirySection } from "./components/studio/EnquirySection";
 import { StudioAbout } from "./components/studio/StudioAbout";
 import { VirtualStudioPreview } from "./components/studio/VirtualStudioPreview";
-import { getHeroBeatStyle } from "./lib/hero-opening";
 
 const services = [
   {
@@ -125,27 +124,22 @@ export default function AgencyHome({ currentYear }: { currentYear: number }) {
           <div className="container stage-hero-body">
             <h1 id="hero-heading" className="stage-title">
               <span className="stage-row">
-                <span className="stage-line" style={getHeroBeatStyle("line1")}><span>Websites with</span></span>{" "}
-                <span className="stage-line" style={getHeroBeatStyle("line2")}><span>presence.</span></span>
+                <span className="stage-line"><span>Websites with</span></span>{" "}
+                <span className="stage-line"><span>presence.</span></span>
               </span>{" "}
               <span className="stage-row">
-                <span className="stage-line stage-line--ruby" style={getHeroBeatStyle("line3")}><span className="metal-ruby">Software with</span></span>{" "}
-                <span className="stage-line stage-line--gilt" style={getHeroBeatStyle("line4")}><span className="metal-gilt">purpose.</span></span>
+                <span className="stage-line stage-line--ruby"><span className="metal-ruby">Software with</span></span>{" "}
+                <span className="stage-line stage-line--gilt"><span className="metal-gilt">purpose.</span></span>
               </span>
             </h1>
 
-            <div className="stage-opening-rule" aria-hidden="true" style={getHeroBeatStyle("datumRule")}>
-              <span className="stage-opening-rule-line" />
-              <span className="stage-opening-rule-glint" />
-            </div>
-
             <div className="stage-foot">
               <div className="stage-intro">
-                <p className="stage-tagline" style={getHeroBeatStyle("tagline")}>Built for your business.</p>
-                <p className="hero-intro" style={getHeroBeatStyle("intro")}>
+                <p className="stage-tagline">Built for your business.</p>
+                <p className="hero-intro">
                   Premium <Link href="/services/web-design-sydney" prefetch={false}>websites and redesigns</Link>, online stores and custom business systems for Australian businesses. Thoughtful design, clear customer journeys and technology that supports your daily work.
                 </p>
-                <div className="hero-actions" style={getHeroBeatStyle("actions")}>
+                <div className="hero-actions">
                   <a className="button button-primary" href="#contact" data-magnetic>
                     Start Your Project <ArrowIcon />
                   </a>
@@ -153,14 +147,12 @@ export default function AgencyHome({ currentYear }: { currentYear: number }) {
                     Explore Our Work <ArrowIcon direction="down-right" />
                   </a>
                 </div>
-                <div className="stage-confidence" style={getHeroBeatStyle("confidence")} aria-label="Explore the studio or call directly">
+                <div className="stage-confidence" aria-label="Explore the studio or call directly">
                   <Link href="/work" prefetch={false}>{projects.length} project case studies <ArrowIcon /></Link>
                   <a href={`tel:${siteConfig.phoneInternational}`}>Prefer a conversation? {siteConfig.phoneDisplay}</a>
                 </div>
               </div>
-              <div className="stage-ticker-entrance" style={getHeroBeatStyle("ticker")}>
-                <LiveTicker items={tickerItems} />
-              </div>
+              <LiveTicker items={tickerItems} />
             </div>
           </div>
 
@@ -209,7 +201,7 @@ export default function AgencyHome({ currentYear }: { currentYear: number }) {
               <ol className="services-list">
                 {serviceRows.map((service) => (
                   <li key={service.number}>
-                    <Link className="service-card" data-reveal href={`/services/${service.slug}`}>
+                    <Link className="service-card" data-tilt data-reveal href={`/services/${service.slug}`}>
                       <span className="service-card-index">{service.number}</span>
                       <h3>{service.title}</h3>
                       <span className="gr-service-body">

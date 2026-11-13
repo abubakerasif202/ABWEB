@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Bodoni_Moda, IBM_Plex_Mono, Schibsted_Grotesk } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { AnchorSettle } from "./components/AnchorSettle";
 import { BrandIntro } from "./components/intro/BrandIntro";
 import { introGateScript } from "./components/intro/intro-gate";
 import { PointerFX } from "./components/PointerFX";
-import { themeBootScript } from "./lib/theme-preference";
 import { siteConfig } from "./site-config";
 import { WebVitals } from "./web-vitals";
 import "./globals.css";
@@ -23,7 +23,6 @@ import "./styles/studio-system.css";
 import "./styles/studio-sections.css";
 import "./styles/studio-harmony.css";
 import "./styles/brand-film.css";
-import "./styles/theme-light.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -86,11 +85,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#070708" },
-    { media: "(prefers-color-scheme: light)", color: "#f6f3ec" },
-  ],
-  colorScheme: "dark light",
+  themeColor: "#070708",
+  colorScheme: "dark",
 };
 
 const structuredData = {
@@ -189,14 +185,15 @@ const monoFont = IBM_Plex_Mono({
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-AU" data-scroll-behavior="smooth" className={`${sansFont.variable} ${displayFont.variable} ${monoFont.variable}`} suppressHydrationWarning>
+    <html lang="en-AU" data-scroll-behavior="smooth" className={`${sansFont.variable} ${displayFont.variable} ${monoFont.variable}`}>
       <body>
-        <script dangerouslySetInnerHTML={{ __html: `${themeBootScript}\n${introGateScript}` }} />
+        <script dangerouslySetInnerHTML={{ __html: introGateScript }} />
         <BrandIntro />
         <WebVitals />
         <AnchorSettle />
         <PointerFX />
         {children}
+        <SpeedInsights />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}

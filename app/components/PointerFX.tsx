@@ -18,6 +18,8 @@ export function PointerFX() {
       active?.style.removeProperty("--pointer-y");
       active?.style.removeProperty("--magnet-x");
       active?.style.removeProperty("--magnet-y");
+      active?.style.removeProperty("--btn-magnet-x");
+      active?.style.removeProperty("--btn-magnet-y");
       active = null;
     };
     const move = (event: PointerEvent) => {
@@ -34,12 +36,14 @@ export function PointerFX() {
         const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width - 0.5) * 2));
         const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height - 0.5) * 2));
         const limit = Math.min(4, motionTokens.tilt.maxDegrees);
-        target.style.setProperty("--magnet-x", `${x * 3}px`);
-        target.style.setProperty("--magnet-y", `${y * 3}px`);
-        target.style.setProperty("--tilt-x", `${-y * limit}deg`);
-        target.style.setProperty("--tilt-y", `${x * limit}deg`);
-        target.style.setProperty("--pointer-x", `${(x + 1) * 50}%`);
-        target.style.setProperty("--pointer-y", `${(y + 1) * 50}%`);
+        target.style.setProperty("--btn-magnet-x", `${(x * 3.5).toFixed(2)}px`);
+        target.style.setProperty("--btn-magnet-y", `${(y * 3.5).toFixed(2)}px`);
+        target.style.setProperty("--magnet-x", `${(x * 5.5).toFixed(2)}px`);
+        target.style.setProperty("--magnet-y", `${(y * 5.5).toFixed(2)}px`);
+        target.style.setProperty("--tilt-x", `${(-y * limit).toFixed(2)}deg`);
+        target.style.setProperty("--tilt-y", `${(x * limit).toFixed(2)}deg`);
+        target.style.setProperty("--pointer-x", `${((x + 1) * 50).toFixed(1)}%`);
+        target.style.setProperty("--pointer-y", `${((y + 1) * 50).toFixed(1)}%`);
       });
     };
     const leave = (event: PointerEvent) => {

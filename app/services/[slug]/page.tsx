@@ -6,7 +6,6 @@ import { ProjectArtwork } from "../../project-artwork";
 import { findProject, projectDisplayDomain } from "../../project-data";
 import { SiteHeader } from "../../site-chrome";
 import { SiteFooter } from "../../site-footer";
-import { buildFaqPageSchema } from "../../lib/faq-schema";
 import { findService, serviceContactHref, serviceDelivery, servicePages } from "../service-data";
 import { siteConfig } from "../../site-config";
 import { ArrowIcon } from "../../icons";
@@ -104,7 +103,14 @@ export default async function ServicePage({ params }: Props) {
           { "@type": "ListItem", position: 3, name: service.title, item: `${siteConfig.url}/services/${service.slug}` },
         ],
       },
-      buildFaqPageSchema(faqs),
+      {
+        "@type": "FAQPage",
+        mainEntity: faqs.map(({ question, answer }) => ({
+          "@type": "Question",
+          name: question,
+          acceptedAnswer: { "@type": "Answer", text: answer },
+        })),
+      },
     ],
   };
 
@@ -135,7 +141,7 @@ export default async function ServicePage({ params }: Props) {
             {/* Decorative detail crop; the same project is linked in full below. */}
             <figure className="service-hero-visual" aria-hidden="true">
               <div className="service-hero-visual-frame">
-                <ProjectArtwork project={featuredProject} slot="service-hero" sizes="(max-width: 900px) 92vw, 440px" />
+                <ProjectArtwork project={featuredProject} priority sizes="(max-width: 900px) 92vw, 440px" />
               </div>
               <figcaption>
                 <span>Studio project</span>
@@ -154,7 +160,7 @@ export default async function ServicePage({ params }: Props) {
               <p className="eyebrow">Built around the goal</p>
               <h2 id="included-heading">What we can help with</h2>
             </div>
-            <ul>{service.benefits.map((benefit, index) => <li key={benefit} data-reveal><span>{String(index + 1).padStart(2, "0")}</span>{benefit}</li>)}</ul>
+            <ul>{service.benefits.map((benefit, index) => <li key={benefit}><span>{String(index + 1).padStart(2, "0")}</span>{benefit}</li>)}</ul>
           </section>
 
           <section className="service-context" aria-labelledby="service-context-heading">
@@ -177,7 +183,7 @@ export default async function ServicePage({ params }: Props) {
               href={`/work/${featuredProject.slug}`}
             >
               <div className="service-project-image">
-                <ProjectArtwork project={featuredProject} slot="service-proof" eager sizes="(max-width: 900px) 92vw, (max-width: 1440px) 52vw, 700px" />
+                <ProjectArtwork project={featuredProject} sizes="(max-width: 900px) 92vw, (max-width: 1440px) 52vw, 700px" />
                 <span>View Case Study <ArrowIcon direction="right" /></span>
               </div>
               <div>
@@ -191,7 +197,7 @@ export default async function ServicePage({ params }: Props) {
                 <li key={project.slug}>
                   <Link href={`/work/${project.slug}`}>
                     <span className="service-project-supporting-image">
-                      <ProjectArtwork project={project} slot="service-proof" sizes="(max-width: 900px) 92vw, 380px" />
+                      <ProjectArtwork project={project} sizes="(max-width: 900px) 92vw, 380px" />
                     </span>
                     <span className="service-project-supporting-copy">
                       <small>{role}</small>

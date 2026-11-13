@@ -32,6 +32,7 @@ export function PortfolioSection() {
               className="gr-index-row"
               href={`/work/${project.slug}`}
               data-cursor="VIEW"
+              data-tilt
             >
               <span className="gr-index-num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
               <span className="gr-index-name">{project.name}</span>

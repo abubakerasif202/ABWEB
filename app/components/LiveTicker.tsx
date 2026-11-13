@@ -42,6 +42,7 @@ export function LiveTicker({ items }: { items: readonly LiveTickerItem[] }) {
         href={`/work/${item.slug}`}
         prefetch={false}
         data-cursor="VIEW"
+        data-tilt
         onPointerEnter={() => setHeld(true)}
         onPointerLeave={() => setHeld(false)}
         onFocus={() => setHeld(true)}

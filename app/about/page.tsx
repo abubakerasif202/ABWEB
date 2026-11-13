@@ -1,0 +1,153 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { StudioAbout } from "../components/studio/StudioAbout";
+import { PageTransition } from "../components/motion/PageTransition";
+import { ArrowIcon } from "../icons";
+import { ProjectArtwork } from "../project-artwork";
+import { findProject, projects, type Project } from "../project-data";
+import { SiteHeader } from "../site-chrome";
+import { SiteFooter } from "../site-footer";
+import { siteConfig } from "../site-config";
+
+const description =
+  "Meet AB Web Studio, a Sydney digital studio creating websites and custom software for Australian businesses with thoughtful design and practical technology.";
+
+export const metadata: Metadata = {
+  title: "About the Studio",
+  description,
+  alternates: { canonical: "/about" },
+  openGraph: {
+    title: `About the Studio | ${siteConfig.name}`,
+    description,
+    url: "/about",
+    siteName: siteConfig.name,
+    type: "website",
+    locale: "en_AU",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${siteConfig.name} — Sydney digital studio` }],
+  },
+  twitter: { card: "summary_large_image", title: `About the Studio | ${siteConfig.name}`, description, images: ["/opengraph-image"] },
+};
+
+const schema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "AboutPage",
+      name: "About AB Web Studio",
+      description,
+      url: `${siteConfig.url}/about`,
+      about: { "@id": `${siteConfig.url}/#organization` },
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
+        { "@type": "ListItem", position: 2, name: "About", item: `${siteConfig.url}/about` },
+      ],
+    },
+  ],
+};
+
+const principles = [
+  ["01", "Show the work first.", "Visitors understand who you help, what you offer and why your business is worth choosing."],
+  ["02", "Explain the business value.", "Information hierarchy and calls to action work together to turn attention into genuine enquiries."],
+  ["03", "Keep the next step obvious.", "Responsive, accessible, search-ready website foundations engineered to feel fast on the devices customers actually use."],
+] as const;
+
+const approach = [
+  ["Design", "Positioning, content hierarchy and a visual direction shaped around the business behind the brief — never a generic template dressed in your colours."],
+  ["Development", "Responsive web applications and digital products built around the way your business works, with accessibility-conscious implementation and technical SEO foundations."],
+  ["Systems", "Inventory, purchasing, sales and invoicing workflows brought together in practical custom software when a website alone is not enough."],
+] as const;
+
+// A varied selection of studio projects, including a protected application.
+const collage = ["aftab-sons-transport", "247-inventory-system", "decent-development"]
+  .map((slug) => findProject(slug))
+  .filter((project): project is Project => Boolean(project));
+
+export default function AboutPage() {
+  return (
+    <>
+      <SiteHeader />
+      <PageTransition>
+      <main className="content-page studio-page gr-about" id="main-content">
+        <nav className="studio-shell studio-crumbs" aria-label="Breadcrumb">
+          <Link href="/">Home</Link>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">About</span>
+        </nav>
+
+        <StudioAbout headingAs="h1" index="01" />
+
+        <section className="container gr-about-approach" aria-labelledby="approach-heading">
+          <div className="gr-section-head">
+            <p className="eyebrow section-index"><span className="section-index-num">02</span><span className="micro-rule" aria-hidden="true" />Approach</p>
+            <h2 id="approach-heading" className="gr-display-l">Design, development and <span className="accent-serif">systems</span> under one roof.</h2>
+          </div>
+          <ol className="gr-about-approach-list">
+            {approach.map(([title, copy], index) => (
+              <li key={title} data-reveal>
+                <span className="gr-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                <h3>{title}</h3>
+                <p>{copy}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="gr-about-collage" aria-labelledby="collage-heading">
+          <div className="container">
+            <div className="gr-about-collage-head" data-reveal>
+              <p className="eyebrow">Selected studio projects</p>
+              <h2 id="collage-heading">From a first impression to <span className="accent-serif">day-to-day operations.</span></h2>
+              <Link className="text-link" href="/work">See all {projects.length} projects <ArrowIcon /></Link>
+            </div>
+            <div className="gr-about-collage-grid">
+              {collage.map((project, index) => (
+                <Link className={`gr-about-tile gr-about-tile--${index + 1}`} href={`/work/${project.slug}`} key={project.slug} data-cursor="VIEW" data-reveal>
+                  <span className="gr-about-tile-media">
+                    <ProjectArtwork project={project} slot="about-collage" sizes="(max-width: 860px) 92vw, 50vw" />
+                  </span>
+                  <span className="gr-about-tile-caption"><span>{project.sector}</span>{project.name}</span><span className="studio-project-evidence">{project.description}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="gr-about-principles" aria-labelledby="principles-heading">
+          <div className="container">
+            <div className="gr-section-head">
+              <p className="eyebrow section-index"><span className="section-index-num">03</span><span className="micro-rule" aria-hidden="true" />The AB standard</p>
+              <h2 id="principles-heading" className="gr-display-l">Feel the quality. <span className="accent-serif">Then see the thinking.</span></h2>
+            </div>
+            <ol className="gr-about-principles-list">
+              {principles.map(([number, title, copy]) => (
+                <li key={number} data-reveal>
+                  <span>{number}</span>
+                  <h3>{title}</h3>
+                  <p>{copy}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <aside className="gr-final-cta" aria-labelledby="about-cta-heading">
+          <div className="container gr-final-cta-inner" data-reveal>
+            <p className="eyebrow">Start a conversation</p>
+            <h2 id="about-cta-heading">Tell us what you are building and where you want the business to <span className="accent-serif">go.</span></h2>
+            <div className="content-actions">
+              <Link className="button button-primary" href="/contact">Start a project <ArrowIcon /></Link>
+              <Link className="button button-ghost" href="/services">Explore services <ArrowIcon direction="right" /></Link>
+            </div>
+          </div>
+        </aside>
+
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} />
+      </main>
+      </PageTransition>
+      <SiteFooter currentYear={new Date().getUTCFullYear()} />
+    </>
+  );
+}

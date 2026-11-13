@@ -1,0 +1,207 @@
+import type { Metadata, Viewport } from "next";
+import { Bodoni_Moda, IBM_Plex_Mono, Schibsted_Grotesk } from "next/font/google";
+import { AnchorSettle } from "./components/AnchorSettle";
+import { BrandIntro } from "./components/intro/BrandIntro";
+import { introGateScript } from "./components/intro/intro-gate";
+import { PointerFX } from "./components/PointerFX";
+import { themeBootScript } from "./lib/theme-preference";
+import { siteConfig } from "./site-config";
+import { WebVitals } from "./web-vitals";
+import "./globals.css";
+import "./studio.css";
+import "./motion.css";
+import "./intro.css";
+import "./editorial.css";
+import "./gilt-ruby.css";
+import "./compositions.css";
+import "./studio-premium.css";
+import "./studio-pages.css";
+import "./gilt-ruby-stage.css";
+import "./premium-dev.css";
+// The studio system states the final word on tokens, chrome and shared sections.
+import "./styles/studio-system.css";
+import "./styles/studio-sections.css";
+import "./styles/studio-harmony.css";
+import "./styles/brand-film.css";
+import "./styles/theme-light.css";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
+  applicationName: siteConfig.name,
+  title: {
+    default: "AB Web Studio | Web Design Studio in Sydney",
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: [
+    "web design Sydney",
+    "website development Australia",
+    "Sydney web design agency",
+    "SEO services Australia",
+    "small business websites Sydney",
+    "AB Web Studio",
+  ],
+  authors: [{ name: siteConfig.name, url: siteConfig.url }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
+  category: "Web design and development",
+  alternates: { canonical: "/" },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  openGraph: {
+    title: "Web Design Sydney & Custom Business Systems | AB Web Studio",
+    description: siteConfig.description,
+    url: "/",
+    siteName: siteConfig.name,
+    type: "website",
+    locale: "en_AU",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "AB Web Studio — websites and custom business systems" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Web Design Sydney | AB Web Studio",
+    description: siteConfig.description,
+    images: ["/opengraph-image"],
+  },
+  icons: {
+    icon: [
+      { url: "/brand/ab-luxury-mark-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/brand/ab-luxury-mark-64.png", type: "image/png", sizes: "64x64" },
+    ],
+    shortcut: "/brand/ab-luxury-mark-32.png",
+    apple: "/brand/ab-luxury-mark-180.png",
+  },
+  manifest: "/manifest.webmanifest",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#070708" },
+    { media: "(prefers-color-scheme: light)", color: "#f6f3ec" },
+  ],
+  colorScheme: "dark light",
+};
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Organization", "ProfessionalService"],
+      "@id": `${siteConfig.url}/#organization`,
+      name: siteConfig.name,
+      url: siteConfig.url,
+      logo: `${siteConfig.url}/brand/ab-logo-luxury-source.png`,
+      image: `${siteConfig.url}/opengraph-image`,
+      description: siteConfig.description,
+      telephone: siteConfig.phoneInternational,
+      email: siteConfig.email,
+      areaServed: { "@type": "Country", name: "Australia" },
+      sameAs: [siteConfig.social.linkedin, siteConfig.social.github, siteConfig.social.facebook, siteConfig.social.instagram].filter((url): url is string => Boolean(url)),
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Sydney",
+        addressRegion: "NSW",
+        addressCountry: "AU",
+      },
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: siteConfig.phoneInternational,
+        email: siteConfig.email,
+        contactType: "sales",
+        areaServed: "AU",
+        availableLanguage: "English",
+      },
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Digital services",
+        itemListElement: [
+          "Website design and development",
+          "SEO and local visibility",
+          "Branding and content",
+          "E-commerce solutions",
+          "Digital marketing",
+          "Website care and support",
+          "Custom software and business systems",
+        ].map((name) => ({
+          "@type": "Offer",
+          itemOffered: { "@type": "Service", name },
+        })),
+      },
+    },
+    {
+      "@type": "Person",
+      "@id": `${siteConfig.url}/#founder`,
+      name: "Abubakar Asif",
+      jobTitle: "Founder & Lead Developer",
+      worksFor: { "@id": `${siteConfig.url}/#organization` },
+      sameAs: [siteConfig.social.github, siteConfig.social.linkedin],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${siteConfig.url}/#website`,
+      url: siteConfig.url,
+      name: siteConfig.name,
+      description: siteConfig.description,
+      inLanguage: "en-AU",
+      publisher: { "@id": `${siteConfig.url}/#organization` },
+    },
+  ],
+};
+
+// Gilt & Ruby type system: a didone for display (it echoes the hairline/thick
+// strokes of the AB monogram), a grotesk for interface and body copy, and a
+// mono for micro labels and indices.
+const sansFont = Schibsted_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+});
+
+// Preload the display faces for editorial headlines. The optical-size axis
+// keeps their hairlines crisp from small cards to the oversized hero.
+const displayFont = Bodoni_Moda({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
+  display: "swap",
+  variable: "--font-display",
+});
+
+// Labels only: two weights, never on the critical path.
+const monoFont = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  preload: false,
+  display: "swap",
+  variable: "--font-mono",
+});
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="en-AU" data-scroll-behavior="smooth" className={`${sansFont.variable} ${displayFont.variable} ${monoFont.variable}`} suppressHydrationWarning>
+      <body>
+        <script dangerouslySetInnerHTML={{ __html: `${themeBootScript}\n${introGateScript}` }} />
+        <BrandIntro />
+        <WebVitals />
+        <AnchorSettle />
+        <PointerFX />
+        {children}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
+        />
+      </body>
+    </html>
+  );
+}

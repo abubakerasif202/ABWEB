@@ -1,0 +1,291 @@
+"use client";
+
+import { ABBrandImage } from "./components/brand/ABBrandImage";
+import { ThemeToggle } from "./components/ThemeToggle";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { ArrowIcon } from "./icons";
+import { siteConfig } from "./site-config";
+
+export function SiteHeader() {
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileCtaVisible, setMobileCtaVisible] = useState(false);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+  // Keep speculative route assets off the homepage's initial rendering path.
+  const prefetchNavigation = (pathname !== "/" && pathname !== "/studio") || menuOpen;
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    let frameId = 0;
+    const onScroll = () => {
+      if (frameId) return;
+      frameId = window.requestAnimationFrame(() => {
+        frameId = 0;
+        setScrolled(window.scrollY > 24);
+      });
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frameId) window.cancelAnimationFrame(frameId);
+    };
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && menuOpen) {
+        setMenuOpen(false);
+        menuButtonRef.current?.focus();
+        return;
+      }
+
+      if (event.key !== "Tab" || !menuOpen || !navRef.current) return;
+
+      const navItems = Array.from(
+        navRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      const focusableItems = [menuButtonRef.current, ...navItems].filter(
+        (item): item is HTMLElement => item !== null,
+      );
+      const firstItem = focusableItems[0];
+      const lastItem = focusableItems.at(-1);
+
+      if (!firstItem || !lastItem) return;
+      if (event.shiftKey && document.activeElement === firstItem) {
+        event.preventDefault();
+        lastItem.focus();
+      } else if (!event.shiftKey && document.activeElement === lastItem) {
+        event.preventDefault();
+        firstItem.focus();
+      }
+    };
+
+    const backgroundRegions = [
+      document.querySelector(".skip-link"),
+      document.querySelector(".brand"),
+      document.getElementById("main-content"),
+      document.querySelector(".site-footer"),
+    ].filter((element): element is HTMLElement => element !== null);
+
+    document.addEventListener("keydown", onKeyDown);
+    document.body.classList.toggle("nav-open", menuOpen);
+    backgroundRegions.forEach((region) => {
+      region.inert = menuOpen;
+    });
+    // Wait for the panel to become focusable, including visibility transitions.
+    let focusFrame: number | null = null;
+    const focusFirstLink = () => {
+      const firstLink = navRef.current?.querySelector<HTMLElement>("a");
+      if (!firstLink) return;
+      if (window.getComputedStyle(firstLink).visibility === "visible") {
+        firstLink.focus();
+        if (document.activeElement === firstLink) return;
+      }
+      focusFrame = window.requestAnimationFrame(focusFirstLink);
+    };
+    if (menuOpen) focusFrame = window.requestAnimationFrame(focusFirstLink);
+    return () => {
+      if (focusFrame !== null) window.cancelAnimationFrame(focusFrame);
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.classList.remove("nav-open");
+      backgroundRegions.forEach((region) => {
+        region.inert = false;
+      });
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
+    const mobileViewport = window.matchMedia("(max-width: 720px)");
+    const eligibleRoute = pathname !== "/privacy";
+    // Sections that already carry their own enquiry actions (and need the screen to themselves) opt in
+    // with data-conversion-area, so the sticky button never covers them.
+    const conversionAreas = [
+      document.getElementById("contact"),
+      document.querySelector(".site-footer"),
+      ...Array.from(document.querySelectorAll("[data-conversion-area]")),
+    ].filter((element): element is Element => element !== null);
+    const visibleConversionAreas = new Set<Element>();
+    const observedConversionAreas = new Set<Element>();
+    let animationFrameId: number | null = null;
+    let mobileTrackingActive = false;
+    let renderedVisibility = false;
+
+    const publishVisibility = (visible: boolean) => {
+      if (visible === renderedVisibility) return;
+      renderedVisibility = visible;
+      setMobileCtaVisible(visible);
+    };
+    const updateVisibility = () => {
+      animationFrameId = null;
+      const observerReady = observedConversionAreas.size === conversionAreas.length;
+      publishVisibility(
+        eligibleRoute
+        && mobileViewport.matches
+        && observerReady
+        && window.scrollY > window.innerHeight * 0.72
+        && visibleConversionAreas.size === 0,
+      );
+    };
+    const scheduleVisibilityUpdate = () => {
+      if (animationFrameId !== null) return;
+      animationFrameId = window.requestAnimationFrame(updateVisibility);
+    };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        observedConversionAreas.add(entry.target);
+        if (entry.isIntersecting) visibleConversionAreas.add(entry.target);
+        else visibleConversionAreas.delete(entry.target);
+      });
+      scheduleVisibilityUpdate();
+    }, { threshold: 0 });
+
+    const stopMobileTracking = () => {
+      if (!mobileTrackingActive) return;
+      mobileTrackingActive = false;
+      observer.disconnect();
+      visibleConversionAreas.clear();
+      observedConversionAreas.clear();
+      window.removeEventListener("scroll", scheduleVisibilityUpdate);
+      window.removeEventListener("resize", scheduleVisibilityUpdate);
+      if (animationFrameId !== null) {
+        window.cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      publishVisibility(false);
+    };
+    const startMobileTracking = () => {
+      if (mobileTrackingActive || !mobileViewport.matches) return;
+      mobileTrackingActive = true;
+      conversionAreas.forEach((element) => observer.observe(element));
+      window.addEventListener("scroll", scheduleVisibilityUpdate, { passive: true });
+      window.addEventListener("resize", scheduleVisibilityUpdate, { passive: true });
+      scheduleVisibilityUpdate();
+    };
+    const handleViewportChange = () => {
+      if (eligibleRoute && mobileViewport.matches) startMobileTracking();
+      else stopMobileTracking();
+    };
+
+    mobileViewport.addEventListener("change", handleViewportChange);
+    handleViewportChange();
+
+    return () => {
+      stopMobileTracking();
+      mobileViewport.removeEventListener("change", handleViewportChange);
+    };
+  }, [pathname]);
+
+  useEffect(() => {
+    if (pathname !== "/") return;
+    const sections = ["services", "work", "process", "about", "contact"]
+      .map((id) => document.getElementById(id))
+      .filter((element): element is HTMLElement => element !== null);
+    if (sections.length === 0) return;
+
+    const visibleSections = new Set<string>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) visibleSections.add(entry.target.id);
+          else visibleSections.delete(entry.target.id);
+        });
+        setActiveSection(sections.find((section) => visibleSections.has(section.id))?.id ?? null);
+      },
+      { rootMargin: "-45% 0px -50% 0px", threshold: 0 },
+    );
+    sections.forEach((section) => observer.observe(section));
+    return () => {
+      observer.disconnect();
+      setActiveSection(null);
+    };
+  }, [pathname]);
+
+  useEffect(() => {
+    // The nav is only a modal panel up to the 960px breakpoint (see globals.css);
+    // if the viewport grows past it while open, the scroll lock and inert state
+    // must not linger on the desktop layout.
+    const mobileNavViewport = window.matchMedia("(max-width: 960px)");
+    const closeWhenDesktop = (event: MediaQueryListEvent) => {
+      if (!event.matches) setMenuOpen(false);
+    };
+    mobileNavViewport.addEventListener("change", closeWhenDesktop);
+    return () => mobileNavViewport.removeEventListener("change", closeWhenDesktop);
+  }, []);
+
+  const handleNavLinkClick = () => {
+    if (!menuOpen) return;
+    setMenuOpen(false);
+    // Focus sat inside the panel that is now hidden; return it to the toggle
+    // (same as Escape) instead of dropping it to <body>.
+    menuButtonRef.current?.focus();
+  };
+  // Real pages mark their own nav item as the current page; on the homepage
+  // the scroll-spy marks the in-page section being read instead.
+  const routeSection = pathname.startsWith("/work") ? "work"
+    : pathname.startsWith("/services") ? "services"
+    : pathname.startsWith("/studio") ? "studio"
+    : pathname.startsWith("/about") ? "about"
+    : pathname.startsWith("/contact") ? "contact"
+    : null;
+  const navLinkClass = (id: string) => (activeSection === id || routeSection === id ? "is-active" : undefined);
+  const navLinkCurrent = (id: string) => (routeSection === id ? "page" : activeSection === id ? "location" : undefined);
+
+  return (
+    <>
+      <a className="skip-link" href="#main-content">Skip to content</a>
+      <header className={`site-header${scrolled ? " is-scrolled" : ""}`} id="top">
+        <div className="container nav-wrap">
+          <Link prefetch={prefetchNavigation} className="brand" href="/" aria-label="AB Web Studio home">
+            <ABBrandImage decorative eager />
+          </Link>
+
+          <nav
+            ref={navRef}
+            id="primary-navigation"
+            className={`site-nav${menuOpen ? " is-open" : ""}`}
+            aria-label="Primary navigation"
+          >
+            <Link href="/work" prefetch={prefetchNavigation} onClick={handleNavLinkClick} className={navLinkClass("work")} aria-current={navLinkCurrent("work")}>Work</Link>
+            <Link href="/services" prefetch={prefetchNavigation} onClick={handleNavLinkClick} className={navLinkClass("services")} aria-current={navLinkCurrent("services")}>Services</Link>
+            <Link href="/studio" prefetch={false} onClick={handleNavLinkClick} className={navLinkClass("studio")} aria-current={navLinkCurrent("studio")}>Studio</Link>
+            <Link href="/#process" prefetch={prefetchNavigation} onClick={handleNavLinkClick} className={navLinkClass("process")} aria-current={navLinkCurrent("process")}>Process</Link>
+            <Link href="/about" prefetch={prefetchNavigation} onClick={handleNavLinkClick} className={navLinkClass("about")} aria-current={navLinkCurrent("about")}>About</Link>
+            <Link href="/contact" prefetch={prefetchNavigation} onClick={handleNavLinkClick} className={navLinkClass("contact")} aria-current={navLinkCurrent("contact")}>Contact</Link>
+            <a className="nav-phone" href={`tel:${siteConfig.phoneInternational}`} onClick={handleNavLinkClick}>{siteConfig.phoneDisplay}</a>
+            <Link className="nav-cta" href="/contact" prefetch={prefetchNavigation} onClick={handleNavLinkClick} data-magnetic>
+              Start a project <ArrowIcon direction="right" />
+            </Link>
+          </nav>
+
+          <ThemeToggle />
+
+          <button
+            ref={menuButtonRef}
+            className="menu-toggle"
+            type="button"
+            aria-expanded={menuOpen}
+            aria-controls="primary-navigation"
+            aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
+      </header>
+      {mobileCtaVisible && !menuOpen ? (
+        <Link prefetch={prefetchNavigation} className="mobile-project-cta" href={pathname === "/" ? "#contact" : "/contact"}>
+          Start a project <ArrowIcon />
+        </Link>
+      ) : null}
+    </>
+  );
+}

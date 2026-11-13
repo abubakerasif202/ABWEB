@@ -1,0 +1,267 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { PageTransition } from "../../components/motion/PageTransition";
+import { notFound } from "next/navigation";
+import { ProjectArtwork } from "../../project-artwork";
+import { findProject, projectDisplayDomain } from "../../project-data";
+import { SiteHeader } from "../../site-chrome";
+import { SiteFooter } from "../../site-footer";
+import { buildFaqPageSchema } from "../../lib/faq-schema";
+import { findService, serviceContactHref, serviceDelivery, servicePages } from "../service-data";
+import { siteConfig } from "../../site-config";
+import { ArrowIcon } from "../../icons";
+
+type Props = { params: Promise<{ slug: string }> };
+
+export function generateStaticParams() {
+  return servicePages.map(({ slug }) => ({ slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const service = findService((await params).slug);
+  if (!service) return {};
+  // Search titles carry the commercial and local intent; the SEO titles already end with the
+  // brand, so they bypass the layout title template instead of repeating it.
+  const { seoTitle, seoDescription: description } = service;
+  return {
+    title: { absolute: seoTitle },
+    description,
+    alternates: { canonical: `/services/${service.slug}` },
+    openGraph: {
+      title: seoTitle,
+      description,
+      url: `/services/${service.slug}`,
+      siteName: siteConfig.name,
+      type: "website",
+      locale: "en_AU",
+      images: [{
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: `${service.title} by ${siteConfig.name}`,
+      }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seoTitle,
+      description,
+      images: ["/opengraph-image"],
+    },
+  };
+}
+
+export default async function ServicePage({ params }: Props) {
+  const service = findService((await params).slug);
+  if (!service) notFound();
+
+  const proofProjects = service.proof.map(({ slug, role }) => {
+    const project = findProject(slug);
+    if (!project) throw new Error(`service ${service.slug}: unknown project "${slug}"`);
+    return { project, role };
+  });
+  const [primaryProof, ...supportingProof] = proofProjects;
+  const featuredProject = primaryProof.project;
+  const contactHref = serviceContactHref(service);
+  const relatedMap: Record<string, string[]> = {
+    "web-design-sydney": ["branding-content", "seo-local-visibility", "website-maintenance"],
+    "ecommerce-website-development": ["digital-marketing", "web-design-sydney", "website-maintenance"],
+    "seo-local-visibility": ["web-design-sydney", "digital-marketing", "ecommerce-website-development"],
+    "branding-content": ["web-design-sydney", "digital-marketing", "seo-local-visibility"],
+    "digital-marketing": ["seo-local-visibility", "ecommerce-website-development", "branding-content"],
+    "website-maintenance": ["web-design-sydney", "ecommerce-website-development", "seo-local-visibility"],
+    "custom-software-business-systems": ["web-design-sydney", "ecommerce-website-development", "website-maintenance"],
+  };
+
+  const relatedSlugs = relatedMap[service.slug] ?? [];
+  const relatedServices = relatedSlugs
+    .map((slug) => findService(slug))
+    .filter((s): s is (typeof servicePages)[number] => Boolean(s));
+  const delivery = serviceDelivery[service.slug];
+  const process = delivery.steps.map(([title, copy], index) => [String(index + 1).padStart(2, "0"), title, copy]);
+  const faqs = service.faqs;
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Service",
+        name: service.title,
+        serviceType: service.title,
+        description: service.summary,
+        url: `${siteConfig.url}/services/${service.slug}`,
+        provider: { "@id": `${siteConfig.url}/#organization`, name: siteConfig.name, email: siteConfig.email },
+        areaServed: [
+          { "@type": "City", name: "Sydney" },
+          { "@type": "AdministrativeArea", name: "New South Wales" },
+          { "@type": "Country", name: "Australia" },
+        ],
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
+          { "@type": "ListItem", position: 2, name: "Services", item: `${siteConfig.url}/services` },
+          { "@type": "ListItem", position: 3, name: service.title, item: `${siteConfig.url}/services/${service.slug}` },
+        ],
+      },
+      buildFaqPageSchema(faqs),
+    ],
+  };
+
+  return (
+    <>
+      <SiteHeader />
+      <PageTransition>
+      <main className="content-page service-page" id="main-content">
+        <div className="container content-shell">
+          <nav className="content-breadcrumb" aria-label="Breadcrumb">
+            <Link href="/">Home</Link>
+            <span aria-hidden="true">/</span>
+            <Link href="/services">Services</Link>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">{service.title}</span>
+          </nav>
+
+          <header className="service-hero">
+            <div className="service-hero-copy">
+              <p className="eyebrow">Digital services / Sydney</p>
+              <h1>{service.h1}</h1>
+              <p className="content-lead">{service.intro}</p>
+              <div className="content-actions">
+                <Link className="button button-primary" href={contactHref}>{service.ctaLabel} <ArrowIcon /></Link>
+                <Link className="button button-ghost" href="/work">View Our Work</Link>
+              </div>
+            </div>
+            {/* Decorative detail crop; the same project is linked in full below. */}
+            <figure className="service-hero-visual" aria-hidden="true">
+              <div className="service-hero-visual-frame">
+                <ProjectArtwork project={featuredProject} slot="service-hero" sizes="(max-width: 900px) 92vw, 440px" />
+              </div>
+              <figcaption>
+                <span>Studio project</span>
+                {featuredProject.name}
+              </figcaption>
+            </figure>
+          </header>
+
+          <section className="studio-concept" aria-labelledby="concept-heading">
+            <div><p className="eyebrow">Planning the work</p><h2 id="concept-heading">{service.title}, in layers.</h2><p>These are the areas we review together. Your proposal sets out the deliverables, responsibilities and costs.</p></div>
+            <ol className="studio-interface-layers">{delivery.layers.map((layer, index) => <li key={layer}><span aria-hidden="true">0{index + 1}</span>{layer}</li>)}</ol>
+          </section>
+
+          <section className="service-inclusions" aria-labelledby="included-heading">
+            <div className="service-section-heading">
+              <p className="eyebrow">Built around the goal</p>
+              <h2 id="included-heading">What we can help with</h2>
+            </div>
+            <ul>{service.benefits.map((benefit, index) => <li key={benefit} data-reveal><span>{String(index + 1).padStart(2, "0")}</span>{benefit}</li>)}</ul>
+          </section>
+
+          <section className="service-context" aria-labelledby="service-context-heading">
+            <p className="eyebrow">Strategy before output</p>
+            <div>
+              <h2 id="service-context-heading">{service.detailTitle}</h2>
+              <p>{service.detail}</p>
+              <Link className="text-link" href={contactHref}>Discuss your {service.title} project <ArrowIcon /></Link>
+            </div>
+          </section>
+
+          <section className="service-showcase" aria-labelledby="work-proof-heading">
+            <div className="service-section-heading">
+              <p className="eyebrow">Relevant project experience</p>
+              <h2 id="work-proof-heading">{featuredProject.name}: the work behind the service.</h2>
+              <p>{featuredProject.overview}</p>
+            </div>
+            <Link
+              className="service-project"
+              href={`/work/${featuredProject.slug}`}
+            >
+              <div className="service-project-image">
+                <ProjectArtwork project={featuredProject} slot="service-proof" eager sizes="(max-width: 900px) 92vw, (max-width: 1440px) 52vw, 700px" />
+                <span>View Case Study <ArrowIcon direction="right" /></span>
+              </div>
+              <div>
+                <p>{primaryProof.role}</p>
+                <h3>{featuredProject.name}</h3>
+                <span>{featuredProject.description}</span>
+              </div>
+            </Link>
+            <ul className="service-project-supporting" aria-label="More project experience">
+              {supportingProof.map(({ project, role }) => (
+                <li key={project.slug}>
+                  <Link href={`/work/${project.slug}`}>
+                    <span className="service-project-supporting-image">
+                      <ProjectArtwork project={project} slot="service-proof" sizes="(max-width: 900px) 92vw, 380px" />
+                    </span>
+                    <span className="service-project-supporting-copy">
+                      <small>{role}</small>
+                      <strong>{project.name}</strong>
+                      <span>{projectDisplayDomain(project)} <ArrowIcon direction="right" /></span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="service-process" aria-labelledby="service-process-heading">
+            <div className="service-section-heading">
+              <p className="eyebrow">A visible process</p>
+              <h2 id="service-process-heading">From first conversation to a dependable result.</h2>
+            </div>
+            <ol>
+              {process.map(([number, title, description]) => (
+                <li key={number} data-reveal>
+                  <span>{number}</span>
+                  <div><h3>{title}</h3><p>{description}</p></div>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <section className="service-faq" aria-labelledby="service-faq-heading">
+            <div className="service-section-heading">
+              <p className="eyebrow">Useful details</p>
+              <h2 id="service-faq-heading">Frequently asked questions</h2>
+            </div>
+            <div>
+              {faqs.map(({ question, answer }) => (
+                <details key={question}>
+                  <summary>{question}<span aria-hidden="true">+</span></summary>
+                  <p>{answer}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+
+          <section className="related-services" aria-labelledby="related-services-heading">
+            <div className="service-section-heading">
+              <p className="eyebrow">Connected capabilities</p>
+              <h2 id="related-services-heading">Related services</h2>
+            </div>
+            <div>
+              {relatedServices.map((related) => (
+                <Link href={`/services/${related.slug}`} key={related.slug}>
+                  <span>{related.title}</span><ArrowIcon />
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <section className="service-cta" aria-labelledby="service-cta-heading">
+            <p className="eyebrow">Ready when you are</p>
+            <h2 id="service-cta-heading">Let&apos;s turn the next digital decision into useful progress.</h2>
+            <p>Tell us what you are working toward. We will respond with a practical recommendation and a clear next step.</p>
+            <div className="content-actions">
+              <Link className="button button-primary" href={contactHref}>{service.ctaLabel} <ArrowIcon /></Link>
+              <Link className="button button-ghost" href="/work">View Our Work</Link>
+            </div>
+          </section>
+        </div>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} />
+      </main>
+      </PageTransition>
+      <SiteFooter currentYear={new Date().getUTCFullYear()} />
+    </>
+  );
+}

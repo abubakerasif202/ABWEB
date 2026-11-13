@@ -1,0 +1,553 @@
+/* Light mode theme layer ------------------------------------------------------
+   Warm limestone parchment surfaces, crisp gallery white plates, deep obsidian
+   ink typography, and burnished bronze-gilt accents calibrated for >= 4.5:1
+   contrast across every band and route. Applied strictly under
+   html[data-theme="light"] with zero filter inversion hacks. */
+
+html[data-theme="light"] {
+  color-scheme: light;
+
+  /* Core studio semantic tokens */
+  --obsidian: #f6f3ec;
+  --surface: #ffffff;
+  --surface-2: #ece7dc;
+  --ivory: #121215;
+  --ivory-muted: #4d4841;
+  --placeholder: #5f5951;
+  --gilt: #855b0d;
+  --gilt-bright: #694608;
+  --ruby: #c41430;
+  --ruby-deep: #9c0f24;
+  --ruby-mark: #b41028;
+  --ruby-text: #a81028;
+  --hair: rgba(17, 17, 20, 0.14);
+  --hair-strong: rgba(17, 17, 20, 0.28);
+  --accent-ink: var(--gilt);
+
+  /* Legacy aliases synced cleanly */
+  --ink: #f6f3ec;
+  --ink-soft: #ffffff;
+  --panel: #ffffff;
+  --panel-light: #ece7dc;
+  --paper: #121215;
+  --paper-dim: #3d3933;
+  --paper-warm: #ebe5d9;
+  --muted: #4d4841;
+  --muted-dark: #5f5951;
+  --red: #c41430;
+  --red-bright: #c41430;
+  --red-dark: #7d0c1f;
+  --red-text: #a81028;
+  --red-ink: #a81028;
+  --brand-red: #c41430;
+  --brand-red-bright: #c41430;
+  --brand-red-dark: #7d0c1f;
+  --gold: #855b0d;
+  --gold-bright: #694608;
+  --gold-dark: #694608;
+  --champagne: #694608;
+  --line: rgba(17, 17, 20, 0.14);
+  --line-strong: rgba(17, 17, 20, 0.28);
+  --gilt-metal: linear-gradient(100deg, #694608 0%, #9b6c16 32%, #754e0a 56%, #b27d1c 82%, #694608 100%);
+  --ruby-metal: linear-gradient(100deg, #8c0c20 0%, #c41430 48%, #7d0c1f 100%);
+}
+
+/* Header & theme toggle button ----------------------------------------------- */
+.theme-toggle {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--hair-strong);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ivory);
+  transition: border-color var(--dur-ui, 300ms) var(--ease-lux, ease),
+    background-color var(--dur-ui, 300ms) var(--ease-lux, ease),
+    color var(--dur-ui, 300ms) var(--ease-lux, ease);
+}
+
+@media (hover: hover) {
+  .theme-toggle:hover {
+    border-color: var(--gilt);
+    background: color-mix(in srgb, var(--gilt) 11%, transparent);
+    color: var(--gilt-bright);
+  }
+}
+
+.theme-toggle:focus-visible {
+  border-color: var(--gilt);
+  background: color-mix(in srgb, var(--gilt) 11%, transparent);
+  color: var(--gilt-bright);
+}
+
+.theme-toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Default dark mode offers sun icon (switch to light); light mode offers moon (switch to dark). */
+.theme-toggle-icon--moon {
+  display: none;
+}
+
+html[data-theme="light"] .theme-toggle-icon--sun {
+  display: none;
+}
+
+html[data-theme="light"] .theme-toggle-icon--moon {
+  display: inline-flex;
+}
+
+@media (max-width: 960px) {
+  .site-header .nav-wrap {
+    gap: 10px 14px;
+  }
+
+  .theme-toggle {
+    margin-left: auto;
+  }
+}
+
+html[data-theme="light"] .site-header {
+  border-bottom-color: var(--hair);
+  background: rgba(246, 243, 236, 0.88);
+}
+
+html[data-theme="light"] .site-header.is-scrolled {
+  border-bottom-color: var(--hair);
+  background: rgba(246, 243, 236, 0.96);
+}
+
+html[data-theme="light"] body:has(.gr-contact) .site-header {
+  background: rgba(246, 243, 236, 0.96);
+}
+
+html[data-theme="light"] .site-header .site-nav .nav-cta:is(:hover, :focus-visible) {
+  background: rgba(133, 91, 13, 0.08);
+  color: var(--gilt-bright);
+}
+
+@media (max-width: 960px) {
+  html[data-theme="light"] .site-header,
+  html[data-theme="light"] .site-header.is-scrolled {
+    background: var(--obsidian);
+  }
+}
+
+/* Hero stage ------------------------------------------------------------------ */
+html[data-theme="light"] .hero,
+html[data-theme="light"] .cinematic-home .stage-hero {
+  background:
+    radial-gradient(ellipse 44% 52% at 82% 32%, rgba(196, 20, 48, 0.06), transparent 70%),
+    radial-gradient(ellipse 46% 58% at 76% 46%, rgba(181, 134, 42, 0.13), transparent 70%),
+    var(--obsidian);
+}
+
+html[data-theme="light"] .cinematic-home .stage-hero::before {
+  opacity: 0.42;
+}
+
+html[data-theme="light"] .hero-intro a,
+html[data-theme="light"] .standard-points a,
+html[data-theme="light"] .content-lead a {
+  color: var(--ivory);
+  text-decoration-color: var(--gilt);
+}
+
+html[data-theme="light"] .cinematic-home .stage-tagline {
+  color: var(--gilt-bright);
+}
+
+html[data-theme="light"] .stage-confidence a {
+  color: var(--ivory-muted);
+}
+
+html[data-theme="light"] .stage-confidence a:first-child {
+  color: var(--gilt-bright);
+}
+
+html[data-theme="light"] .stage-confidence a:is(:hover, :focus-visible) {
+  color: var(--ivory);
+}
+
+html[data-theme="light"] .live-ticker,
+html[data-theme="light"] .live-ticker-toggle {
+  border-color: var(--hair-strong);
+  background: var(--surface);
+  color: var(--ivory);
+  box-shadow: 0 12px 32px rgba(17, 17, 20, 0.07);
+}
+
+html[data-theme="light"] .live-ticker:is(:hover, :focus-visible),
+html[data-theme="light"] .live-ticker-toggle:is(:hover, :focus-visible) {
+  border-color: var(--gilt);
+  background: var(--surface-2);
+  color: var(--gilt-bright);
+}
+
+html[data-theme="light"] .live-ticker-copy small {
+  color: var(--gilt-bright);
+}
+
+html[data-theme="light"] .live-ticker-copy > span {
+  color: var(--ivory-muted);
+}
+
+/* Marquee & intentional deep-crimson editorial bands ------------------------- */
+html[data-theme="light"] .hero-marquee {
+  border-block-color: var(--hair);
+}
+
+html[data-theme="light"] .cinematic-home .ruby-band,
+html[data-theme="light"] .gr-about-brand {
+  --obsidian: #15070a;
+  --surface: #22090f;
+  --surface-2: #2d0b14;
+  --ivory: #f6f3ec;
+  --ivory-muted: rgba(246, 243, 236, 0.84);
+  --paper: #f6f3ec;
+  --paper-dim: rgba(246, 243, 236, 0.88);
+  --gilt: #efc96a;
+  --gilt-bright: #f5d98c;
+  --gold-bright: #efc96a;
+  --champagne: #f5dfb0;
+  --accent-ink: #efc96a;
+  --hair: rgba(246, 243, 236, 0.18);
+  --hair-strong: rgba(246, 243, 236, 0.3);
+  color: #f6f3ec;
+}
+
+html[data-theme="light"] .gr-about-mark {
+  background: #0d0d10;
+}
+
+html[data-theme="light"] .cinematic-home .ruby-band h2,
+html[data-theme="light"] .cinematic-home .ruby-band h3,
+html[data-theme="light"] .cinematic-home .ruby-band .capability-card,
+html[data-theme="light"] .cinematic-home .ruby-band .capability-link {
+  color: #f6f3ec;
+}
+
+/* Work sections (Home + /work + /work/[slug]) ------------------------------ */
+html[data-theme="light"] .cinematic-home .gr-work .section-heading-link,
+html[data-theme="light"] .gr-flagship .project-cta,
+html[data-theme="light"] .gr-duo-item .project-cta,
+html[data-theme="light"] .gr-wi-cta,
+html[data-theme="light"] .gr-cs-next-cta {
+  color: var(--gilt-bright);
+}
+
+html[data-theme="light"] .cinematic-home .gr-work .section-heading-link:hover,
+html[data-theme="light"] .gr-duo-item:is(:hover, :focus-visible) h3,
+html[data-theme="light"] .gr-wi-link:is(:hover, :focus-visible) .gr-wi-title,
+html[data-theme="light"] .gr-cs-next-link:is(:hover, :focus-visible) .gr-cs-next-title {
+  color: var(--gilt-bright);
+}
+
+html[data-theme="light"] .gr-flagship-media::after {
+  background: linear-gradient(
+    to bottom,
+    rgba(246, 243, 236, 0) 0%,
+    rgba(246, 243, 236, 0.78) 56%,
+    var(--obsidian) 100%
+  );
+}
+
+html[data-theme="light"] .work-index-hero {
+  background: linear-gradient(170deg, #faf8f4, var(--obsidian));
+}
+
+html[data-theme="light"] .gr-wi-filter-bar {
+  border-block-color: var(--hair);
+  background: rgba(246, 243, 236, 0.92);
+}
+
+html[data-theme="light"] .work-index-filter {
+  border-color: var(--hair-strong);
+  color: var(--ivory-muted);
+}
+
+html[data-theme="light"] .work-index-filter:is(:hover, :focus-visible) {
+  border-color: var(--ruby);
+  color: var(--ivory);
+}
+
+html[data-theme="light"] .work-index-filter.is-active {
+  border-color: var(--ruby);
+  background: var(--ruby);
+  color: #ffffff;
+}
+
+html[data-theme="light"] .work-index-page .gr-wi-media,
+html[data-theme="light"] .showcase-stage {
+  border-color: var(--hair);
+  box-shadow: 0 24px 52px -28px rgba(17, 17, 20, 0.18);
+}
+
+html[data-theme="light"] .work-index-page .gr-wi-link:is(:hover, :focus-visible) .gr-wi-media {
+  border-color: var(--gilt);
+  box-shadow: 0 32px 60px -28px rgba(17, 17, 20, 0.24);
+}
+
+html[data-theme="light"] .gr-cs-hero-media .browser-frame {
+  border-color: var(--hair-strong);
+  box-shadow: 0 40px 80px -36px rgba(17, 17, 20, 0.2);
+}
+
+html[data-theme="light"] .browser-bar {
+  border-bottom-color: var(--hair);
+  background: var(--surface-2);
+}
+
+html[data-theme="light"] .browser-bar i {
+  background: rgba(17, 17, 20, 0.22);
+}
+
+html[data-theme="light"] .browser-bar i:first-child {
+  background: var(--ruby);
+}
+
+html[data-theme="light"] .browser-bar span {
+  color: var(--ivory-muted);
+}
+
+html[data-theme="light"] .gr-cs--system .gr-cs-hero-media {
+  border-block-color: var(--hair);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(196, 20, 48, 0.08), transparent 46%),
+    var(--surface-2);
+}
+
+html[data-theme="light"] .gr-cs .gr-cs-pan {
+  box-shadow: 18px 18px 0 -1px var(--obsidian), 18px 18px 0 0 var(--hair-strong);
+}
+
+@media (max-width: 767px) {
+  html[data-theme="light"] .gr-cs .gr-cs-pan {
+    box-shadow: 7px 7px 0 -1px var(--obsidian), 7px 7px 0 0 var(--hair-strong);
+  }
+}
+
+html[data-theme="light"] .gr-cs-live {
+  background: var(--surface-2);
+}
+
+html[data-theme="light"] .gr-cs-live .button-primary {
+  background: var(--ruby);
+  color: #ffffff;
+}
+
+html[data-theme="light"] .gr-cs-live .button-primary:is(:hover, :focus-visible) {
+  background: var(--ruby-deep);
+  color: #ffffff;
+}
+
+/* Services, About & Case study interior overrides --------------------------- */
+html[data-theme="light"] .content-page {
+  background:
+    radial-gradient(circle at 82% 12%, rgba(181, 134, 42, 0.14), transparent 34%),
+    var(--obsidian);
+}
+
+html[data-theme="light"] .content-lead,
+html[data-theme="light"] .content-breadcrumb,
+html[data-theme="light"] .gr-svc-section .gr-section-head-aside p,
+html[data-theme="light"] .gr-svc-group-count,
+html[data-theme="light"] .gr-svc-group-desc,
+html[data-theme="light"] .gr-svc-summary,
+html[data-theme="light"] .gr-svc-panel-copy .gr-kicker,
+html[data-theme="light"] .gr-about-principles-list p,
+html[data-theme="light"] .gr-about-values dd,
+html[data-theme="light"] .gr-contact .content-breadcrumb,
+html[data-theme="light"] .gr-contact .content-lead,
+html[data-theme="light"] .gr-contact-location {
+  color: var(--ivory-muted);
+}
+
+html[data-theme="light"] .content-breadcrumb a:hover,
+html[data-theme="light"] .gr-contact .content-breadcrumb a:hover {
+  color: var(--ivory);
+}
+
+html[data-theme="light"] .service-hero-visual-frame {
+  box-shadow: 0 32px 68px rgba(17, 17, 20, 0.16);
+}
+
+html[data-theme="light"] .service-hero-visual figcaption {
+  color: #f6f3ec;
+}
+
+html[data-theme="light"] .service-hero-visual figcaption span {
+  color: #efc96a;
+}
+
+html[data-theme="light"] .service-inclusions li,
+html[data-theme="light"] .related-services > div:last-child a {
+  border-color: var(--hair);
+  background: var(--surface);
+  color: var(--ivory);
+}
+
+html[data-theme="light"] .related-services > div:last-child a:is(:hover, :focus-visible) {
+  border-color: var(--gilt);
+  background: var(--surface-2);
+}
+
+html[data-theme="light"] .service-page .service-cta {
+  color: #ffffff;
+}
+
+html[data-theme="light"] .service-page .service-cta .eyebrow,
+html[data-theme="light"] .service-page .service-cta h2 {
+  color: #ffffff;
+}
+
+html[data-theme="light"] .service-page .service-cta .button.button-primary {
+  border-color: #d1a64c;
+  background: #d1a64c;
+  color: #121215;
+}
+
+html[data-theme="light"] .service-page .service-cta .button.button-primary:is(:hover, :focus-visible) {
+  border-color: #121215;
+  background: #121215;
+  color: #ffffff;
+}
+
+html[data-theme="light"] .service-page .gr-svc-row {
+  border-bottom-color: var(--hair);
+}
+
+html[data-theme="light"] .service-page .gr-svc-row:is(:hover, :focus-visible) {
+  background: rgba(17, 17, 20, 0.035);
+}
+
+html[data-theme="light"] .gr-svc-icon {
+  border-color: var(--hair-strong);
+  background: var(--surface);
+  color: var(--gilt);
+}
+
+html[data-theme="light"] .gr-svc-row:is(:hover, :focus-visible, .is-active) .gr-svc-icon {
+  border-color: var(--gilt);
+  background: rgba(133, 91, 13, 0.1);
+  color: var(--gilt-bright);
+}
+
+html[data-theme="light"] .gr-contact {
+  background: var(--obsidian);
+  color: var(--ivory);
+}
+
+html[data-theme="light"] .gr-contact-direct {
+  border-top-color: var(--hair-strong);
+}
+
+html[data-theme="light"] .gr-contact-direct a {
+  border-bottom-color: var(--hair);
+  color: var(--ivory);
+}
+
+html[data-theme="light"] .gr-contact-direct a > span:first-child {
+  color: var(--ruby);
+}
+
+html[data-theme="light"] .gr-contact-next {
+  background: var(--surface-2);
+  color: var(--ivory);
+}
+
+/* Brand film media frame & About crest plate -------------------------------- */
+/* Media players & metallic gold emblem plates remain framed in deep obsidian
+   so cinema frames and gold monogram artwork stay razor-sharp. */
+html[data-theme="light"] .logo-reveal,
+html[data-theme="light"] .film-stage {
+  --ivory: #f6f3ec;
+  --ivory-muted: #c9c4ba;
+  --gilt: #d1a64c;
+  --gilt-bright: #efc96a;
+  --hair: rgba(246, 243, 236, 0.16);
+  --hair-strong: rgba(246, 243, 236, 0.28);
+  border-color: var(--hair-strong);
+  background: #0b0b0e;
+  color: #f6f3ec;
+}
+
+html[data-theme="light"] .studio-plate--mark {
+  background:
+    radial-gradient(60% 60% at var(--pointer-x, 50%) var(--pointer-y, 45%), rgba(209, 166, 76, 0.16), transparent 70%),
+    radial-gradient(90% 70% at 85% 110%, rgba(196, 20, 48, 0.08), transparent 60%),
+    #111115;
+  border-color: rgba(17, 17, 20, 0.24);
+}
+
+html[data-theme="light"] .studio-plate--mark .studio-plate-ring--inner {
+  border-color: rgba(244, 241, 234, 0.16);
+}
+
+html[data-theme="light"] .studio-plate--mark::after {
+  background: linear-gradient(to bottom left, transparent calc(50% - 0.75px), rgba(244, 241, 234, 0.26) 50%, transparent calc(50% + 0.75px));
+}
+
+/* Contact & enquiry form light surfaces ------------------------------------- */
+html[data-theme="light"] .studio-enquiry {
+  background:
+    radial-gradient(900px 480px at 12% 0%, rgba(196, 20, 48, 0.05), transparent 70%),
+    var(--obsidian);
+}
+
+html[data-theme="light"] .contact-form.enquiry-form {
+  box-shadow: 0 24px 60px -36px rgba(17, 17, 20, 0.14);
+}
+
+html[data-theme="light"] .contact-form.enquiry-form :is(input:not([type="checkbox"], [type="radio"]), textarea):hover {
+  border-color: rgba(17, 17, 20, 0.42);
+}
+
+html[data-theme="light"] .contact-form.enquiry-form :is(input:not([type="checkbox"], [type="radio"]), textarea):focus {
+  border-color: var(--gilt);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px rgba(133, 91, 13, 0.14);
+}
+
+html[data-theme="light"] .contact-form.enquiry-form [aria-invalid="true"]:focus {
+  border-color: var(--ruby-mark);
+  box-shadow: 0 0 0 4px rgba(180, 16, 40, 0.14);
+}
+
+html[data-theme="light"] .form-chip input:checked + span {
+  border-color: var(--gilt);
+  background: var(--gilt);
+  color: #ffffff;
+}
+
+html[data-theme="light"] .contact-form.enquiry-form .button svg.enquiry-submit-spinner {
+  color: #ffffff;
+}
+
+html[data-theme="light"] .contact-form.enquiry-form .form-status.success {
+  border-color: rgba(20, 122, 68, 0.32);
+  border-left-color: #147a44;
+  background: linear-gradient(90deg, rgba(20, 122, 68, 0.08), var(--surface-2) 65%);
+}
+
+html[data-theme="light"] .contact-form.enquiry-form .form-status.success .form-status-icon-wrap,
+html[data-theme="light"] .contact-form.enquiry-form .form-status.success .form-status-label {
+  color: #0f6537;
+}
+
+html[data-theme="light"] .contact-form.enquiry-form .form-status.error {
+  border-color: rgba(180, 16, 40, 0.3);
+  border-left-color: var(--ruby-mark);
+  background: linear-gradient(90deg, rgba(180, 16, 40, 0.08), var(--surface-2) 65%);
+}
+
+html[data-theme="light"] .contact-form.enquiry-form .form-status-dismiss:is(:hover, :focus-visible) {
+  background: rgba(17, 17, 20, 0.06);
+}

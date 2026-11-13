@@ -1,0 +1,205 @@
+import { createHash } from "node:crypto";
+import { NextRequest, NextResponse } from "next/server";
+import { siteConfig } from "../../site-config";
+import { RATE_LIMIT_RETRY_SECONDS, withinRateLimit } from "./rate-limit";
+import { contactBudgets, contactServices } from "../../contact-options";
+
+export const runtime = "nodejs";
+
+type ContactPayload = Record<string, unknown>;
+const MAX_BODY_BYTES = 12_000;
+const IDEMPOTENCY_BUCKET_MS = 10 * 60 * 1000;
+
+const SUBMISSION_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Resend keys must be unique per request and expire after 24 hours. The key binds the
+// client's per-submission id to the whole validated enquiry, so retries of one
+// submission collapse into one email while an edited resend gets a fresh key (reusing
+// a key with a changed payload would be rejected). Clients without an id fall back to
+// the payload plus a ten-minute bucket.
+function deliveryKey(submissionId: string, fields: unknown[]) {
+  const scope = SUBMISSION_ID_PATTERN.test(submissionId)
+    ? submissionId.toLowerCase()
+    : `legacy-${Math.floor(Date.now() / IDEMPOTENCY_BUCKET_MS)}`;
+  return `contact-${createHash("sha256").update(JSON.stringify([scope, fields])).digest("hex")}`;
+}
+
+// One stable, PII-free line so a log drain or alert rule can match `contact_delivery_failed`.
+function logDeliveryFailure(reason: string) {
+  console.error(JSON.stringify({ event: "contact_delivery_failed", reason }));
+}
+const allowedServices = new Set<string>(contactServices);
+const allowedBudgets = new Set<string>(["", ...contactBudgets]);
+const allowedTimelines = new Set(["", "As soon as possible", "Within 1 month", "Within 2–3 months", "Just exploring"]);
+
+function value(payload: ContactPayload, key: string, max: number) {
+  const item = payload[key];
+  return typeof item === "string" ? item.trim().slice(0, max) : "";
+}
+
+function tooLong(payload: ContactPayload, key: string, max: number) {
+  return typeof payload[key] === "string" && (payload[key] as string).trim().length > max;
+}
+
+function singleLine(payload: ContactPayload, key: string, max: number) {
+  return value(payload, key, max).replace(/[\r\n\t]+/g, " ");
+}
+
+// The enquiry form sends `services` (one or more checkbox choices); older
+// clients send a single `service` string. Either way every choice must be an
+// offered option, listed once. Returns null when the selection is invalid.
+function selectedServices(payload: ContactPayload): string[] | null {
+  const raw = "services" in payload ? payload.services : payload.service;
+  const choices = typeof raw === "string" && !("services" in payload) ? [raw] : raw;
+  if (!Array.isArray(choices) || choices.length === 0 || choices.length > allowedServices.size) return null;
+  const services = choices.map((choice) => (typeof choice === "string" ? choice.trim() : ""));
+  const valid = services.every((service) => allowedServices.has(service));
+  return valid && new Set(services).size === services.length ? services : null;
+}
+
+function allowedOrigin(request: NextRequest) {
+  const origin = request.headers.get("origin");
+  if (!origin) return true;
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const host = forwardedHost || request.headers.get("host");
+  const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const protocol = forwardedProto || (host?.startsWith("localhost") || host?.startsWith("127.0.0.1") ? "http" : "https");
+  if (!host) return false;
+  try { return new URL(origin).origin === `${protocol}://${host}`; } catch { return false; }
+}
+
+async function readPayload(request: NextRequest): Promise<ContactPayload> {
+  if (!request.body) throw new Error("missing-body");
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let byteLength = 0;
+  while (true) {
+    const { done, value: chunk } = await reader.read();
+    if (done) break;
+    byteLength += chunk.byteLength;
+    if (byteLength > MAX_BODY_BYTES) {
+      await reader.cancel();
+      throw new Error("body-too-large");
+    }
+    chunks.push(chunk);
+  }
+  const body = new Uint8Array(byteLength);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  const parsed: unknown = JSON.parse(new TextDecoder().decode(body));
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("invalid-payload");
+  return parsed as ContactPayload;
+}
+
+export async function POST(request: NextRequest) {
+  if (!allowedOrigin(request)) return NextResponse.json({ error: "This request could not be verified." }, { status: 403 });
+  // Per Vercel's documented headers: x-forwarded-for is overwritten by Vercel
+  // with the public client IP (and mirrored in x-real-ip), so neither can be
+  // spoofed on Vercel. When another proxy sits in front of Vercel,
+  // x-vercel-forwarded-for carries the original client IP and is preferred.
+  // Requests with no usable IP share one "unknown" rate-limit bucket.
+  const clientIp = request.headers.get("x-vercel-forwarded-for")?.split(",")[0]?.trim()
+    || request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+    || request.headers.get("x-real-ip")?.trim()
+    || "unknown";
+  if (!await withinRateLimit(clientIp)) return NextResponse.json({ error: "Too many enquiries. Please wait a few minutes or contact us directly." }, { status: 429, headers: { "Retry-After": String(RATE_LIMIT_RETRY_SECONDS), "Cache-Control": "no-store" } });
+  const contentLength = Number(request.headers.get("content-length") || 0);
+  if (!Number.isFinite(contentLength) || contentLength < 0 || contentLength > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: "This enquiry is too large." }, { status: 413 });
+  }
+
+  let payload: ContactPayload;
+  try {
+    payload = await readPayload(request);
+  } catch (error) {
+    const tooLarge = error instanceof Error && error.message === "body-too-large";
+    return NextResponse.json({ error: tooLarge ? "This enquiry is too large." : "Invalid enquiry." }, { status: tooLarge ? 413 : 400 });
+  }
+
+  if (singleLine(payload, "company", 100)) return NextResponse.json({ ok: true });
+
+  if (tooLong(payload, "fullName", 160) || tooLong(payload, "firstName", 80)
+    || tooLong(payload, "lastName", 80) || tooLong(payload, "email", 254)
+    || tooLong(payload, "phone", 50) || tooLong(payload, "service", 100)
+    || tooLong(payload, "business", 160)
+    || tooLong(payload, "budget", 100) || tooLong(payload, "timeline", 100)
+    || tooLong(payload, "message", 4000)) {
+    return NextResponse.json({ error: "Please shorten your enquiry and try again." }, { status: 400 });
+  }
+
+  const fullName = singleLine(payload, "fullName", 160)
+    || [singleLine(payload, "firstName", 80), singleLine(payload, "lastName", 80)].filter(Boolean).join(" ");
+  const email = singleLine(payload, "email", 254);
+  const phone = singleLine(payload, "phone", 50);
+  const business = singleLine(payload, "business", 160);
+  const services = selectedServices(payload);
+  const budget = singleLine(payload, "budget", 100);
+  const timeline = singleLine(payload, "timeline", 100);
+  const message = value(payload, "message", 4000);
+  const submissionId = value(payload, "submissionId", 64);
+  if (!fullName || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json({ error: "Please complete your name, email and project details." }, { status: 400 });
+  }
+  if (!services || !allowedBudgets.has(budget) || !allowedTimelines.has(timeline)) {
+    return NextResponse.json({ error: "Please choose the form options provided." }, { status: 400 });
+  }
+
+  // Preview deployments must never deliver real enquiries, even if a delivery
+  // key is later added to the Preview scope. Say so plainly: no false success.
+  if (process.env.VERCEL_ENV === "preview") {
+    return NextResponse.json(
+      { error: "Enquiry submissions are disabled in preview deployments. Nothing was sent.", code: "preview-disabled" },
+      { status: 503 },
+    );
+  }
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return NextResponse.json({ error: `Online enquiries are temporarily unavailable. Please email ${siteConfig.email}.` }, { status: 503 });
+
+  const lines = [
+    `Name: ${fullName}`, `Email: ${email}`, `Phone: ${phone || "Not supplied"}`,
+    `Business: ${business || "Not supplied"}`,
+    `Services: ${services.join(", ")}`, `Approx. budget: ${budget || "Not selected"}`,
+    `Ideal timeline: ${timeline || "Not selected"}`, "", "Project details:", message,
+  ];
+  const idempotencyKey = deliveryKey(submissionId, [fullName, email, phone, business, services, budget, timeline, message]);
+  let response: Response;
+  try {
+    response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", "Idempotency-Key": idempotencyKey },
+      body: JSON.stringify({
+        from: process.env.CONTACT_FROM_EMAIL || `${siteConfig.name} <${siteConfig.email}>`,
+        to: [process.env.CONTACT_TO_EMAIL?.trim() || siteConfig.email],
+        reply_to: email,
+        subject: `Website enquiry from ${fullName}`,
+        text: lines.join("\n"),
+      }),
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch {
+    logDeliveryFailure("request-failed");
+    return NextResponse.json({ error: `Email delivery is temporarily unavailable. Please email ${siteConfig.email}.` }, { status: 502 });
+  }
+  // Resend answers 409 when the same key is still in flight (a concurrent duplicate)
+  // or was reused with a different payload; neither may be reported as a new send.
+  if (response.status === 409) {
+    logDeliveryFailure("provider-idempotency-conflict");
+    return NextResponse.json({ error: "Your enquiry is already being sent. Please wait a moment before trying again." }, { status: 409 });
+  }
+  if (!response.ok) {
+    logDeliveryFailure(`provider-status-${response.status}`);
+    return NextResponse.json({ error: `We could not send your enquiry. Please email ${siteConfig.email}.` }, { status: 502 });
+  }
+  // A successful HTTP status alone does not establish provider acceptance.
+  const delivery: unknown = await response.json().catch(() => null);
+  if (!delivery || typeof delivery !== "object" || !("id" in delivery)
+    || typeof delivery.id !== "string" || !delivery.id.trim()) {
+    logDeliveryFailure("no-acceptance-id");
+    return NextResponse.json({ error: `We could not confirm delivery. Please email ${siteConfig.email} before resending.` }, { status: 502 });
+  }
+  return NextResponse.json({ ok: true });
+}

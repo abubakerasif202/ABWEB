@@ -1,0 +1,117 @@
+import type { NextConfig } from "next";
+
+// This file is loaded in isolation by the security test, so it cannot import the app.
+// Keep this string identical to STUDIO_ASSET_REV in app/studio/studio-assets.ts.
+const STUDIO_ASSET_REV = "r2";
+
+const isDevelopment = process.env.NODE_ENV === "development";
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'self'",
+  "object-src 'none'",
+  "img-src 'self' data: blob: https:",
+  `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self' data:",
+  `connect-src 'self'${isDevelopment ? " ws: wss:" : ""}`,
+  "manifest-src 'self'",
+  "worker-src 'self' blob:",
+  ...(!isDevelopment ? ["upgrade-insecure-requests"] : []),
+].join("; ");
+
+const securityHeaders = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+  {
+    key: "Content-Security-Policy",
+    value: contentSecurityPolicy,
+  },
+  // Diagnose inline framework scripts before considering a nonce migration.
+  // Report-only never blocks hydration, and preserves static page caching.
+  ...(process.env.CSP_REPORT_ONLY === "true" && !isDevelopment
+    ? [{
+      key: "Content-Security-Policy-Report-Only",
+      value: contentSecurityPolicy.replace(/script-src [^;]+/, "script-src 'self'"),
+    }]
+    : []),
+];
+
+const nextConfig: NextConfig = {
+  output: "standalone",
+  poweredByHeader: false,
+  compress: true,
+  // Pin the workspace root so an unrelated lockfile in a parent directory
+  // cannot be inferred as the build root.
+  turbopack: { root: import.meta.dirname },
+  experimental: {
+    // A restored Turbopack build cache on Vercel shipped stale CSS under a
+    // content-hashed name (new HTML, old stylesheet). This small site builds
+    // quickly from scratch, so correctness wins over warm-cache build speed.
+    turbopackFileSystemCacheForBuild: false,
+  },
+  images: {
+    formats: ["image/avif", "image/webp"],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1440, 1920],
+    imageSizes: [32, 64, 96, 128, 256, 384],
+  },
+  async rewrites() {
+    // Versioned URLs are the cache key. The files stay at their stable public paths.
+    return [
+      { source: `/studio/${STUDIO_ASSET_REV}/ab-monogram.glb`, destination: "/studio/ab-monogram.glb" },
+      { source: `/studio/${STUDIO_ASSET_REV}/room-environment.bin`, destination: "/studio/room-environment.bin" },
+      { source: `/studio/${STUDIO_ASSET_REV}/screens/:file`, destination: "/studio/screens/:file" },
+    ];
+  },
+  async redirects() {
+    // Retire the deleted legacy static concept. Paths are enumerated (not a
+    // :path* wildcard) so the live portfolio assets under /assets keep serving.
+    const legacySitePaths = [
+      "/site/ab-digital-premium",
+      "/site/ab-digital-premium/index.html",
+      "/site/ab-digital-premium/script.js",
+      "/site/ab-digital-premium/styles.css",
+      "/site/ab-digital-premium/README.md",
+    ];
+    return legacySitePaths.map((source) => ({
+      source,
+      destination: "/",
+      permanent: true,
+    }));
+  },
+  async headers() {
+    return [
+      { source: "/(.*)", headers: securityHeaders },
+      // Design-review routes are never indexable, whatever the page metadata says.
+      { source: "/preview/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] },
+      // Social share images are crawled from page metadata; keep them out of the web index.
+      ...["/opengraph-image", "/work/:slug/opengraph-image"].map((source) => ({
+        source,
+        headers: [{ key: "X-Robots-Tag", value: "noindex" }],
+      })),
+      {
+        source: "/site/ab-digital-premium/assets/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        // Only the versioned studio URLs. The poster and unversioned files keep short caching.
+        source: `/studio/${STUDIO_ASSET_REV}/:path*`,
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      // Film and brand files keep stable filenames, so they cannot be immutable:
+      // a day of browser caching plus a week of stale-while-revalidate lets the
+      // CDN and repeat visitors skip revalidating multi-megabyte media.
+      ...["/film/:path*", "/brand/:path*"].map((source) => ({
+        source,
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+      })),
+    ];
+  },
+};
+
+export default nextConfig;

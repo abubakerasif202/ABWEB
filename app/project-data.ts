@@ -1,0 +1,563 @@
+import { assetBase } from "./site-config";
+
+export type Project = {
+  slug: string;
+  headline?: string;
+  region?: string;
+  name: string;
+  category: string;
+  sector: string;
+  description: string;
+  overview: string;
+  solution: string;
+  url: string;
+  displayUrl: string;
+  image: string;
+  alt: string;
+  tags: readonly string[];
+  keyFeatures: readonly string[];
+  techStack: readonly string[];
+  kind?: "software";
+  ctaLabel?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  destination?: "hosted-showcase" | "unavailable";
+  gallery?: readonly ProjectShot[];
+};
+
+export type ProjectShot = {
+  src: string;
+  alt: string;
+  caption: string;
+  aspectRatio?: string;
+};
+
+export const projects = [
+  {
+    slug: "jufaja-homes",
+    name: "Jufaja Construction / Jufaja Homes",
+    category: "Construction / Property Digital Platform",
+    sector: "Property & construction",
+    description: "Premium construction and property digital experience.",
+    overview:
+      "Premium digital platform for Jufaja, combining a polished property and construction experience with a modern, responsive interface.",
+    solution:
+      "We created a premium, responsive website presenting Jufaja's home designs and construction offering through clear catalogue navigation, design studies and dedicated enquiry pathways, with a refined forest-green and gold visual identity.",
+    url: "https://www.jufajaconstructions.com.au/",
+    displayUrl: "jufajaconstructions.com.au",
+    image: `${assetBase}/ab-portfolio-jufaja-homes.webp`,
+    alt: "Jufaja Constructions homepage with forest-green and gold branding, home design navigation and illustrative architecture",
+    tags: ["Website Design", "UI/UX", "Frontend Development", "Responsive Development"],
+    keyFeatures: [
+      "Home design catalogue and category navigation",
+      "Construction services and design study presentation",
+      "Dedicated home, house and land, and display home enquiry pathways",
+      "Responsive interface with reduced-motion-aware opening animation",
+    ],
+    techStack: ["Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"],
+    seoTitle: "Jufaja — Web Design & Development",
+    seoDescription: "Premium website and digital experience created for Jufaja by AB Web Studio.",
+  },
+  {
+    slug: "milestone-renovate",
+    name: "Milestone Renovate",
+    category: "Renovation / Planning Platform",
+    sector: "Property & construction",
+    description:
+      "A renovation planning website for Sydney homeowners, pairing guided tools with practical guidance from the first idea to the first conversation.",
+    overview:
+      "Milestone Renovate is the renovation chapter of Milestone, separate from the Milestone Development showcase. It needed a calm, trustworthy front door that helps Sydney homeowners understand cost, design direction and approvals before they speak to anyone.",
+    solution:
+      "We built a forest-green and gold planning platform around four guided tools: an indicative renovation cost planner, a moodboard design studio, a renovation questionnaire and an NSW DA or CDC approvals guide. Enquiries are validated and delivered by email, with indicative estimates and a call request rather than a confirmed booking. The site distinguishes owner-supplied project photography from concept references.",
+    url: "https://milestonerenovate.com/",
+    displayUrl: "milestonerenovate.com",
+    image: `${assetBase}/ab-portfolio-milestone-renovate.webp`,
+    alt: "Milestone Renovate homepage with a forest-green header, gold call to action and an AI-generated renovation concept image",
+    tags: ["Planning Tools", "Interactive UX", "Lead Capture", "Responsive Design"],
+    keyFeatures: [
+      "Indicative renovation cost planner with ranges, timelines and stated assumptions",
+      "Guided design studio that builds a moodboard from the visitor's selections",
+      "Renovation questionnaire feeding a validated email enquiry flow",
+      "NSW approvals guide helping visitors gauge DA or CDC pathways",
+    ],
+    techStack: ["HTML", "Python", "Vanilla JavaScript", "Supabase", "Zod", "Resend", "Vercel"],
+    gallery: [
+      {
+        src: `${assetBase}/ab-portfolio-milestone-renovate-cost-planner.webp`,
+        alt: "Milestone Renovate cost planner showing an indicative estimate range and a not-a-quote notice",
+        caption: "Cost planner: indicative ranges, clearly not a quote.",
+      },
+      {
+        src: `${assetBase}/ab-portfolio-milestone-renovate-design-studio.webp`,
+        alt: "Milestone Renovate design studio introduction with its AI-generated concept imagery notice",
+        caption: "Design studio: a moodboard of selections, labelled concept imagery.",
+      },
+      {
+        src: `${assetBase}/ab-portfolio-milestone-renovate-approvals.webp`,
+        alt: "Milestone Renovate NSW approvals guide with an exempt, CDC or DA pathway result",
+        caption: "Approvals guide: a general pathway guide, not planning advice.",
+      },
+    ],
+    seoTitle: "Milestone Renovate — Renovation Planning Website",
+    seoDescription:
+      "Renovation planning website with a cost planner, design studio and NSW approvals guide, built by AB Web Studio.",
+  },
+  {
+    slug: "aftab-sons-transport",
+    name: "Aftab & Sons Transport",
+    category: "Transport / Logistics Website",
+    sector: "Transport & logistics",
+    description:
+      "Premium transport and logistics website for an Australian heavy-vehicle transport company, with an industrial identity, responsive interface and conversion-focused presentation.",
+    overview:
+      "Aftab & Sons Transport needed a strong digital presence for its Australian truck transport, B-double freight, local delivery and interstate transport services.",
+    solution:
+      "We created a responsive industrial website with clear service and capability paths, motion-led storytelling, accessible reduced-motion behaviour and prominent quote enquiries across screen sizes.",
+    url: "https://www.aftabandsons.com.au/",
+    displayUrl: "aftabandsons.com.au",
+    image: `${assetBase}/ab-portfolio-aftab-sons-transport.webp`,
+    alt: "Aftab & Sons Transport website homepage with a branded B-double truck convoy",
+    tags: ["Responsive Web Design", "Motion Design", "Transport & Logistics"],
+    keyFeatures: [
+      "Truck transport and B-double freight service presentation",
+      "Local delivery and interstate capability pathways",
+      "Responsive quote-focused interface",
+      "Reduced-motion-aware animation system",
+    ],
+    techStack: ["React", "Tailwind CSS", "Framer Motion", "Responsive UI"],
+  },
+  {
+    slug: "247-inventory-system",
+    name: "247 Inventory System",
+    category: "Custom Business Software / Inventory Management",
+    sector: "Custom software",
+    description:
+      "Custom inventory and business management platform for 24/7 Truck Tyre Services, centralising tyre stock, operational workflows, sales and business records.",
+    overview:
+      "24/7 Truck Tyre Services needed a secure internal platform to manage inventory and purchasing alongside day-to-day sales, customer, job and finance workflows.",
+    solution:
+      "We built a role-protected business system covering stock control, transfers, purchasing, point of sale, quotes, invoices, receivables, customers, jobs and operational analytics in one interface.",
+    url: "https://247trucktyreservices.store/",
+    displayUrl: "247trucktyreservices.store",
+    image: `${assetBase}/ab-portfolio-247-inventory-system.webp`,
+    alt: "247 Inventory System secure staff sign-in screen for inventory and purchasing operations",
+    tags: ["Inventory Management", "Sales & Invoicing", "Business Software"],
+    keyFeatures: [
+      "Tyre inventory, stock movement and transfer workflows",
+      "Purchasing, suppliers and purchase order management",
+      "Point of sale, quotes, invoices and receivables",
+      "Secure staff access with operational dashboards",
+    ],
+    techStack: ["Next.js", "TypeScript", "Supabase", "PostgreSQL"],
+    kind: "software",
+    ctaLabel: "View Staff Sign-in",
+  },
+  {
+    slug: "adelaide-wholesale-tyres",
+    name: "Adelaide Wholesale Tyres",
+    category: "E-Commerce / Wholesale Platform",
+    sector: "E-commerce",
+    description:
+      "A modern wholesale tyre platform built for Adelaide workshops, fleets, transport operators and trade buyers to browse live stock and order or request a quote.",
+    overview:
+      "Adelaide Wholesale Tyres supplies truck, commercial, 4WD and passenger tyres from a Regency Park warehouse and needed a digital storefront that made wholesale stock easy for workshops, fleet managers and trade customers to discover and purchase.",
+    solution:
+      "We built a wholesale e-commerce platform with a searchable tyre catalogue filtered by size, application and stock availability, cart-based bulk ordering, a wholesale quote workflow for fleet and recurring supply, and clear Adelaide delivery tiers and warehouse pickup information.",
+    url: "https://adelaidewholesaletyres.com.au/",
+    displayUrl: "adelaidewholesaletyres.com.au",
+    image: `${assetBase}/ab-portfolio-adelaide-wholesale-tyres.webp`,
+    alt: "Adelaide Wholesale Tyres wholesale tyre e-commerce website homepage designed by AB Web Studio",
+    tags: ["Wholesale E-Commerce", "Tyre Catalogue", "Fleet Purchasing"],
+    keyFeatures: [
+      "Searchable wholesale tyre catalogue with live stock availability",
+      "Tyre size, application and in-stock filtering",
+      "Cart-based bulk ordering with wholesale quote workflow",
+      "Adelaide delivery tiers and Regency Park warehouse pickup",
+    ],
+    techStack: ["Next.js", "TypeScript", "Responsive UI", "SEO Structure"],
+  },
+  {
+    slug: "247-truck-tyre-services",
+    name: "24/7 Truck Tyre Services",
+    category: "Automotive / Roadside Assistance / Truck Tyre Services",
+    sector: "Automotive",
+    description:
+      "A responsive roadside assistance website built to generate emergency service enquiries and present truck tyre support for commercial operators.",
+    overview:
+      "24/7 Truck Tyre Services needed a clear digital presence for Adelaide truck drivers, commercial operators and fleets looking for urgent roadside support, tyre supply and fitting services.",
+    solution:
+      "We developed a mobile-first automotive website with an emergency-led information architecture, service enquiry pathways, local search structure and prominent call-to-action elements for roadside assistance and fleet support.",
+    url: "https://www.247trucktyreservices.com.au/",
+    displayUrl: "247trucktyreservices.com.au",
+    image: `${assetBase}/ab-portfolio-247-truck-tyre-services.jpg`,
+    alt: "24/7 Truck Tyre Services website designed by AB Web Studio",
+    tags: ["Emergency UX", "Automotive SEO", "Commercial Services"],
+    keyFeatures: [
+      "Emergency roadside assistance call-to-action pathways",
+      "Truck tyre supply, fitting and service presentation",
+      "National Roadside Assistance Program registration path",
+      "Commercial fleet support and service enquiry structure",
+    ],
+    techStack: ["Next.js", "TypeScript", "Responsive UI", "SEO Structure"],
+  },
+  {
+    slug: "maple-rentals",
+    name: "Maple Rentals",
+    category: "Mobility / Car rentals",
+    sector: "Mobility",
+    description: "Premium driver rentals and streamlined online applications.",
+    overview:
+      "Maple Rentals needed a digital platform that presented driver rental options with authority while giving applicants a direct, low-friction application path.",
+    solution:
+      "We built a structured web experience highlighting rental terms, vehicle tiers, and application requirements, connected directly to enquiry and application pathways.",
+    url: "https://www.maplerentals.com.au/",
+    displayUrl: "maplerentals.com.au",
+    image: `${assetBase}/ab-portfolio-maple-rentals.jpg`,
+    alt: "Maple Rentals website homepage preview",
+    tags: ["UX Design", "Booking Journey", "Mobile Optimised"],
+    keyFeatures: [
+      "Vehicle fleet & rental tier showcase",
+      "Streamlined online application pathway",
+      "Clear driver eligibility & pricing breakdown",
+      "Fast mobile navigation & responsive layout",
+    ],
+    techStack: ["React", "TypeScript", "Vite", "Tailwind CSS"],
+  },
+  {
+    slug: "gala-rentals",
+    name: "Gala Rentals",
+    category: "Mobility / Car rentals",
+    sector: "Mobility",
+    description: "A confident booking experience for weekly car rentals in Sydney.",
+    overview:
+      "Gala Rentals provides weekly car hire for Sydney drivers requiring clear terms, vehicle options, and quick booking requests.",
+    solution:
+      "We designed an accessible, mobile-first website that simplifies vehicle selection, highlights weekly rates, and provides a clear contact and enquiry system.",
+    url: "https://www.galarentals.com.au/",
+    displayUrl: "galarentals.com.au",
+    image: `${assetBase}/ab-portfolio-gala-rentals.jpg`,
+    alt: "Gala Rentals website homepage preview",
+    tags: ["Web Architecture", "Vehicle Showcase", "Local SEO"],
+    keyFeatures: [
+      "Weekly rate transparency and vehicle catalog",
+      "Mobile-first reservation enquiry flow",
+      "Local Sydney service area positioning",
+      "Search-optimised page architecture",
+    ],
+    techStack: ["React", "TypeScript", "Vite", "Tailwind CSS"],
+  },
+  {
+    slug: "zq-removals",
+    name: "ZQ Removals",
+    category: "Services / Removals",
+    sector: "Removals",
+    description: "Local-service positioning and a direct path to quote requests.",
+    overview:
+      "ZQ Removals presents residential and commercial moving services in Adelaide with a direct path to quote enquiries.",
+    solution:
+      "We built a local service website with clear moving services, Adelaide coverage information and direct quote request pathways.",
+    url: "https://zqremovalsadelaide.com.au/",
+    displayUrl: "zqremovalsadelaide.com.au",
+    image: `${assetBase}/ab-portfolio-zq-removals.jpg`,
+    alt: "ZQ Removals website homepage preview",
+    tags: ["Lead Conversion", "Local Service SEO", "Fast Touch-UI"],
+    keyFeatures: [
+      "Direct quote request form integration",
+      "Adelaide service area positioning",
+      "Residential vs commercial service breakdown",
+      "Touch-optimised mobile call & enquiry triggers",
+    ],
+    techStack: ["HTML", "Vanilla CSS", "JavaScript", "JSON-LD"],
+  },
+  {
+    slug: "decent-development",
+    name: "DECENT Development",
+    category: "Property / Development",
+    sector: "Property & construction",
+    description: "A refined digital presence for a Sydney construction business.",
+    overview:
+      "DECENT Development builds custom architectural homes and commercial developments in Sydney, needing a digital presence that reflects their craftsmanship.",
+    solution:
+      "We crafted a dark, sophisticated portfolio site emphasizing project photography, service information and direct consultation enquiries.",
+    url: "https://www.decentdevelopment.com.au/",
+    displayUrl: "decentdevelopment.com.au",
+    image: `${assetBase}/ab-portfolio-decent-development.jpg`,
+    alt: "DECENT Development website homepage preview",
+    tags: ["Brand Direction", "Portfolio Gallery", "Performance"],
+    keyFeatures: [
+      "Full-width architectural project gallery",
+      "Construction service and project information",
+      "Dark luxury aesthetic matching brand identity",
+      "Fast page load & image optimization",
+    ],
+    techStack: ["React", "Vite", "Tailwind CSS", "Framer Motion"],
+  },
+  {
+    slug: "milestone-development",
+    name: "Milestone Development",
+    category: "Property / Construction",
+    sector: "Property & construction",
+    description: "A project-led showcase for residential and commercial construction.",
+    overview:
+      "Milestone Development needed a clean, corporate showcase to communicate their multi-sector construction capabilities and project history.",
+    solution:
+      "We built a project-centric digital platform with structured capability decks, completed project archives, and clear stakeholder contact paths.",
+    url: "https://milestonedevelopment.com.au/",
+    displayUrl: "milestonedevelopment.com.au",
+    image: `${assetBase}/ab-portfolio-milestone-development.jpg`,
+    alt: "Milestone Development website homepage preview",
+    tags: ["Project Showcase", "Responsive Design", "SEO Structure"],
+    keyFeatures: [
+      "Filterable project portfolio showcase",
+      "Commercial & residential capability breakdown",
+      "Company, team and construction process information",
+      "Responsive accessibility-conscious structure",
+    ],
+    techStack: ["HTML", "CSS", "JavaScript", "GSAP"],
+  },
+  {
+    slug: "4-point-concrete",
+    destination: "hosted-showcase",
+    name: "4 Point Concrete",
+    category: "Construction / Civil",
+    sector: "Property & construction",
+    description: "Capability-focused presentation for concrete and structural works.",
+    overview:
+      "4 Point Concrete provides specialised concrete placement and structural civil services across commercial and industrial projects.",
+    solution:
+      "We created a concrete-services website with a clear services structure, project presentation and quote enquiry pathways. Concept imagery is labelled on the hosted showcase.",
+    url: "https://4point-concrete-website.vercel.app/",
+    displayUrl: "4point-concrete-website.vercel.app",
+    image: `${assetBase}/ab-portfolio-four-point-concrete.jpg`,
+    alt: "4 Point Concrete website homepage preview",
+    tags: ["Capability Deck", "Civil Services", "Mobile UX"],
+    keyFeatures: [
+      "Concrete service and capability presentation",
+      "Direct quote enquiry pathway",
+      "Clearly labelled concept imagery",
+      "Responsive navigation and contact options",
+    ],
+    techStack: ["React", "Vite", "Tailwind CSS"],
+  },
+  {
+    slug: "1st-class-express",
+    name: "1st Class Express",
+    category: "Transport & Logistics Website",
+    sector: "Transport & logistics",
+    description:
+      "Interstate freight positioning, a clear fleet showcase and a fast path to quote enquiries on every screen size.",
+    overview:
+      "1st Class Express provides interstate road freight and logistics services across Australia requiring immediate quote generation and fleet presentation.",
+    solution:
+      "We designed an interstate logistics platform featuring freight service breakdowns, fleet asset specifications, and an easy quote enquiry system.",
+    url: "https://www.1stclassexpress.com.au/",
+    displayUrl: "1stclassexpress.com.au",
+    image: `${assetBase}/ab-portfolio-1st-class-express.jpg`,
+    alt: "1st Class Express transport and logistics website homepage preview",
+    tags: ["Freight Positioning", "Fleet Showcase", "Quote Engine"],
+    keyFeatures: [
+      "Interstate freight route & service presentation",
+      "Fleet capacity & vehicle specification breakdown",
+      "Express freight quote request engine",
+      "Mobile-optimised driver & depot contact points",
+    ],
+    techStack: ["React", "TypeScript", "Vite", "Tailwind CSS"],
+  },
+  {
+    slug: "hf-removals-adelaide",
+    name: "HF Removals Adelaide",
+    category: "Services / Removals",
+    sector: "Removals",
+    description:
+      "Published reference rates, an instant quote request and round-the-clock enquiry capture.",
+    overview:
+      "HF Removals Adelaide handles residential, apartment, office and interstate moves from an Elizabeth Vale base, needing pricing transparency and a quote path that converts around the clock.",
+    solution:
+      "We built a rate-transparent removals platform pairing published local and per-cubic-metre interstate pricing with an above-the-fold instant quote form, suburb and route landing pages, and review-backed trust signals.",
+    url: "https://www.hfremovalsadelaide.com.au/",
+    displayUrl: "hfremovalsadelaide.com.au",
+    image: `${assetBase}/ab-portfolio-hf-removals.jpg`,
+    alt: "HF Removals Adelaide website homepage preview",
+    tags: ["Quote Conversion", "Local Service SEO", "Rate Transparency"],
+    keyFeatures: [
+      "Above-the-fold instant quote request form",
+      "Published local rates and per-cubic-metre interstate routes",
+      "Adelaide suburb and interstate route landing pages",
+      "Google review and insurance trust signals throughout",
+    ],
+    techStack: ["Next.js", "TypeScript", "Tailwind CSS", "JSON-LD"],
+  },
+  {
+    slug: "cheap-adelaide-removalist",
+    name: "Cheap Adelaide Removalist",
+    category: "Services / Removals",
+    sector: "Removals",
+    description:
+      "A conversion-focused removals platform for Adelaide, built to make pricing, services and quote requests easy to understand while building a strong local-search content foundation.",
+    overview:
+      "Cheap Adelaide Removalist needed a digital presence that could compete on trust and clarity rather than just price — publishing transparent hourly rates, service coverage and a fast quote path for house, apartment, office and interstate moves across Greater Adelaide.",
+    solution:
+      "We built a local service website with published starting rates and clear pricing conditions, dedicated moving-service pages, Adelaide coverage information, practical moving guides, FAQs and a quote request form that gathers move details.",
+    url: "https://www.cheapadelaideremovalist.com.au/",
+    displayUrl: "cheapadelaideremovalist.com.au",
+    image: `${assetBase}/ab-portfolio-cheap-adelaide-removalist.png`,
+    alt: "Cheap Adelaide Removalist website homepage showing published moving rates and a branded removals truck",
+    tags: ["Local SEO Architecture", "Quote Conversion", "Transparent Pricing UX"],
+    keyFeatures: [
+      "Published starting rates with move-specific pricing conditions",
+      "Dedicated moving-service pages and practical guides",
+      "Adelaide suburb and service-area information",
+      "Multi-field quote request form with property access and inventory scoping",
+    ],
+    techStack: ["Next.js", "TypeScript", "Tailwind CSS", "JSON-LD"],
+  },
+  {
+    slug: "fresh-stop",
+    name: "Fresh Stop",
+    category: "Grocery / Fresh Produce / Online Catalogue",
+    sector: "Grocery & fresh produce",
+    description:
+      "A fresh produce and grocery catalogue for Sydney, with indicative prices, a cart-based enquiry journey and clear wholesale and home delivery contact pathways.",
+    overview:
+      "Fresh Stop serves customers in Rockdale and Riverwood, Sydney, Australia. The business needed a responsive online catalogue that makes its fruit, vegetables, pantry essentials and frozen foods easy to explore before speaking with the team.",
+    solution:
+      "AB Web Studio built a colourful grocery website with category browsing, indicative AUD prices and a shopping cart that prepares an enquiry rather than a confirmed order. Dedicated wholesale and business enquiry pathways sit alongside home delivery enquiries through email and WhatsApp. Responsive navigation and clear product guidance preserve the distinction between browsing, requesting details and placing an order. Product imagery is labelled as illustrative where applicable on the published site.",
+    url: "https://www.freshstop.com.au/",
+    displayUrl: "freshstop.com.au",
+    image: `${assetBase}/ab-portfolio-fresh-stop.jpg`,
+    alt: "Fresh Stop live homepage with green and red branding, fresh produce artwork and catalogue, wholesale and home delivery navigation",
+    tags: ["Product Catalogue", "Cart Enquiries", "Wholesale & Home Delivery", "Responsive Design"],
+    keyFeatures: [
+      "Fresh fruit, vegetables, pantry and frozen food category browsing",
+      "Product browsing with clearly labelled indicative AUD prices",
+      "Cart-based shopping list and enquiry workflow",
+      "Dedicated wholesale and business enquiry pathways",
+      "Home delivery enquiries through email and WhatsApp",
+      "Responsive presentation and navigation across screen sizes",
+    ],
+    techStack: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL"],
+    seoTitle: "Fresh Stop — Grocery Catalogue Website Case Study",
+    seoDescription:
+      "Fresh Stop's Sydney grocery catalogue website by AB Web Studio: indicative prices, cart-based enquiries, wholesale pathways and home delivery contact options.",
+  },
+  {
+    slug: "wild-pest-solutions",
+    name: "Wild Pest Solutions",
+    category: "Regional Services / Wildlife Management",
+    sector: "Environmental & Wildlife Management",
+    region: "New South Wales, Australia",
+    headline: "Digital Experiences Built for the Wild.",
+    description: "A distinctive digital presence for Wild Pest Solutions, connecting NSW landowners with responsible feral animal management services.",
+    overview: "Wild Pest Solutions provides feral animal management services throughout New South Wales. The website presents its specialist services, regional coverage and property enquiry process through a professional, accessible digital experience.",
+    solution: "An earthy visual direction pairs Australian landscape and wildlife imagery with strong typography and spacious layouts. Species-led service navigation helps landowners explore relevant information, while regional coverage and a clear property enquiry pathway guide the next step. Responsive layouts carry that hierarchy from desktop to mobile.",
+    url: "https://wildpestsolutions.com.au/",
+    displayUrl: "wildpestsolutions.com.au",
+    image: `${assetBase}/ab-portfolio-wild-pest-solutions-desktop.webp`,
+    alt: "Wild Pest Solutions desktop homepage presenting feral animal management for NSW landowners",
+    tags: ["Web Design", "Responsive Layouts", "Service Navigation", "Property Enquiries"],
+    keyFeatures: [
+      "Species-led feral animal management service navigation",
+      "Australian landscape and wildlife visual storytelling",
+      "NSW regional coverage information",
+      "Property enquiry and contact pathways",
+    ],
+    techStack: ["Next.js", "TypeScript", "Tailwind CSS", "SEO Structure"],
+    ctaLabel: "Visit Live Website",
+    seoTitle: "Wild Pest Solutions Website Project",
+    seoDescription: "Explore the Wild Pest Solutions website project by AB Web Studio, showcasing a professional digital presence for NSW feral animal management.",
+    gallery: [
+      { src: `${assetBase}/ab-portfolio-wild-pest-solutions-mobile.webp`, alt: "Wild Pest Solutions homepage at a 390 pixel mobile viewport", caption: "The homepage, designed for smaller screens.", aspectRatio: "390 / 844" },
+      { src: `${assetBase}/ab-portfolio-wild-pest-solutions-services.webp`, alt: "Wild Pest Solutions species-led services section", caption: "Service navigation organised around invasive species.", aspectRatio: "1440 / 1000" },
+      { src: `${assetBase}/ab-portfolio-wild-pest-solutions-contact.webp`, alt: "Wild Pest Solutions property assistance enquiry page", caption: "A clear starting point for property enquiries.", aspectRatio: "1440 / 1000" },
+    ],
+  },
+  {
+    slug: "pept-up-labs",
+    name: "Pept Up Labs",
+    category: "E-Commerce / Product Catalogue",
+    sector: "E-commerce",
+    headline: "Precision Meets a Distinctive Digital Experience.",
+    description: "A bold product catalogue for Pept Up Labs, bringing single vials, bulk collections and laboratory accessories into a clear, responsive interface.",
+    overview: "Pept Up Labs presents a catalogue of laboratory research products and accessories. The website helps visitors browse collections, compare available variants and prices in Australian dollars, and find product and order support.",
+    solution: "An electric-blue and cyan palette, dark backgrounds and oversized typography establish a distinctive visual identity. Product artwork anchors the homepage, while collection navigation, strength selection and quick-view controls organise a detailed catalogue. Mobile layouts preserve the hierarchy and direct access to support. The published site identifies its products as intended for laboratory research, not human consumption or therapeutic use.",
+    url: "https://peptuplabs.com.au/",
+    displayUrl: "peptuplabs.com.au",
+    image: `${assetBase}/ab-portfolio-pept-up-labs-desktop.webp`,
+    alt: "Pept Up Labs desktop homepage with electric-blue branding and product catalogue navigation",
+    tags: ["Catalogue Design", "Product Navigation", "Responsive UI", "Brand Experience"],
+    keyFeatures: ["Single-vial, ten-vial bulk pack and accessory collections", "Product strength selection and AUD price presentation", "Quick-view product controls", "Email and WhatsApp support pathways"],
+    techStack: ["React", "TypeScript", "Tailwind CSS", "Responsive UI"],
+    ctaLabel: "Visit Live Website",
+    seoTitle: "Pept Up Labs Website Project",
+    seoDescription: "Explore the Pept Up Labs website project by AB Web Studio: distinctive catalogue design, responsive product navigation and a bold visual identity.",
+    gallery: [
+      { src: `${assetBase}/ab-portfolio-pept-up-labs-mobile.webp`, alt: "Pept Up Labs product catalogue homepage on mobile", caption: "The catalogue experience on a smaller screen.", aspectRatio: "390 / 844" },
+    ],
+  },
+  {
+    slug: "on-call-trailers",
+    name: "On Call Trailers",
+    category: "Trailer Hire / Local Services Website",
+    sector: "Trailer hire",
+    headline: "Ready to Move. Endless Possibilities.",
+    description:
+      "A trailer hire website for Sydney, presenting cage, motorcycle and car trailers with clear specifications, hire rates and booking pathways.",
+    overview:
+      "On Call Trailers hires galvanised cage box and motorcycle trailers from Haberfield, Sydney, with a car trailer available on enquiry. The business needed a site that helps customers choose the right trailer and book without confusion.",
+    solution:
+      "AB Web Studio built a responsive trailer hire website with a night-time Sydney skyline hero, fleet cards showing size, payload and towing weight, a side-by-side comparison table and a towing checklist. Booking routes straight to the live listing, while the car trailer uses an enquiry pathway until its details are confirmed. Customer reviews, pickup hours and a short FAQ sit alongside, and animations can be paused.",
+    url: "https://oncalltrailers.com.au/",
+    displayUrl: "oncalltrailers.com.au",
+    image: `${assetBase}/ab-portfolio-on-call-trailers.webp`,
+    alt: "On Call Trailers homepage with a galvanised cage trailer and a flatbed trailer in front of the Sydney Harbour Bridge at night",
+    tags: ["Website Design", "Trailer Hire", "Booking Journey", "Responsive Design"],
+    keyFeatures: [
+      "Fleet cards for cage, motorcycle and car trailers with size, payload and towing weight",
+      "Side-by-side trailer comparison table",
+      "Direct booking pathways, with enquiry-only handling for the car trailer",
+      "Towing checklist, pickup details and customer reviews",
+      "Pause control for page animations",
+    ],
+    techStack: ["Next.js", "React", "Responsive UI"],
+    ctaLabel: "Visit Live Website",
+    seoTitle: "On Call Trailers Website Project",
+    seoDescription:
+      "Explore the On Call Trailers website project by AB Web Studio: a Sydney trailer hire website with fleet comparison, towing guidance and clear booking pathways.",
+  },
+] as const satisfies readonly Project[];
+
+export const sectors: readonly string[] = Array.from(new Set(projects.map((project) => project.sector)));
+
+export function findProject(slug: string): Project | undefined {
+  return projects.find((project) => project.slug === slug);
+}
+
+export function isSoftwareProject(project: Project): boolean {
+  return project.kind === "software";
+}
+
+export function projectDestinationLabel(project: Project): string {
+  if (project.destination === "unavailable") return "Website currently unavailable";
+  if (project.destination === "hosted-showcase") return "Hosted website showcase";
+  return isSoftwareProject(project) ? "Staff-access system" : "Live website";
+}
+
+export function projectVisitLabel(project: Project): string {
+  if (project.destination === "unavailable") return "Check Project Website";
+  if (project.destination === "hosted-showcase") return "View Website Showcase";
+  return project.ctaLabel ?? "View Live Website";
+}
+
+/**
+ * Visible card label for a project's address. Raw `.vercel.app` hosts read as
+ * unfinished, so they show a commercial badge instead; `url` (the link target)
+ * is never changed.
+ */
+export function projectDisplayDomain(project: Pick<Project, "displayUrl">): string {
+  return project.displayUrl.endsWith(".vercel.app") ? "Interactive Showcase · Live Preview" : project.displayUrl;
+}
+
+/** Editorial label form of a category: "Mobility / Car rentals" → "Mobility · Car rentals". */
+export function formatCategory(category: string): string {
+  return category.split("/").map((part) => part.trim()).filter(Boolean).join(" · ");
+}
